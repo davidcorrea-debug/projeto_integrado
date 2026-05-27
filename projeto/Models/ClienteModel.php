@@ -18,14 +18,16 @@ class ClienteModel extends Database
     {
         if (!empty($busca)) {
             $stmt = $this->execute(
-                "SELECT * FROM clientes
-                 WHERE cliente_nome LIKE ? OR cliente_telefone LIKE ? OR cliente_email LIKE ?
-                 ORDER BY cliente_nome ASC",
+                "SELECT id, nome, email, telefone, cpf_cnpj, ativo FROM usuario
+                 WHERE tipo_usuario = 'CLIENTE' AND ativo = 1
+                 AND (nome LIKE ? OR telefone LIKE ? OR email LIKE ?)
+                 ORDER BY nome ASC",
                 ["%{$busca}%", "%{$busca}%", "%{$busca}%"]
             );
         } else {
             $stmt = $this->execute(
-                "SELECT * FROM clientes ORDER BY cliente_nome ASC"
+                "SELECT id, nome, email, telefone, cpf_cnpj, ativo FROM usuario 
+                 WHERE tipo_usuario = 'CLIENTE' AND ativo = 1 ORDER BY nome ASC"
             );
         }
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -37,7 +39,8 @@ class ClienteModel extends Database
     public function buscarPorId(int $id): ?array
     {
         $stmt = $this->execute(
-            "SELECT * FROM clientes WHERE cliente_id = ? LIMIT 1",
+            "SELECT id, nome, email, telefone, cpf_cnpj, data_nascimento, ativo FROM usuario 
+             WHERE id = ? AND tipo_usuario = 'CLIENTE' LIMIT 1",
             [$id]
         );
         $result = $stmt->fetch(\PDO::FETCH_ASSOC);
@@ -45,10 +48,12 @@ class ClienteModel extends Database
     }
 
     /**
-     * Salva novo cliente
+     * Salva novo cliente (Insere como tipo_usuario = 'CLIENTE')
      */
     public function salvar(array $dados): int
     {
+        $dados['tipo_usuario'] = 'CLIENTE';
+        $dados['ativo'] = true;
         return $this->insert($dados);
     }
 
@@ -57,7 +62,9 @@ class ClienteModel extends Database
      */
     public function atualizar(int $id, array $dados): bool
     {
-        return $this->update("cliente_id = {$id}", $dados);
+        // Garante que continua como CLIENTE
+        $dados['tipo_usuario'] = 'CLIENTE';
+        return $this->update("id = {$id} AND tipo_usuario = 'CLIENTE'", $dados);
     }
 
     /**
