@@ -74,27 +74,53 @@ class AgendamentoModel extends Database
     }
 
     /**
-     * Atualiza status do agendamento
+     * Lista agendamentos do profissional
      */
-    public function atualizarStatus(int $id, string $status): bool
+    public function listarPorProfissional(int $profissional_id, string $data = ''): array
     {
-        return $this->update("agendamento_id = {$id}", ['agendamento_status' => $status]);
+        if (empty($data)) $data = date('Y-m-d');
+
+        $stmt = $this->execute(
+            "SELECT a.id, a.data_hora_inicio, a.status, a.valor_total,
+                    uc.nome as cliente_nome, uc.telefone as cliente_telefone,
+                    e.nome_fantasia as estabelecimento
+             FROM agendamento a
+             INNER JOIN usuario uc ON a.cliente_id = uc.id
+             INNER JOIN estabelecimento e ON a.estabelecimento_id = e.id
+             WHERE a.profissional_id = ? AND DATE(a.data_hora_inicio) = ?
+             ORDER BY a.data_hora_inicio ASC",
+            [$profissional_id, $data]
+        );
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+/**
+     * Verifica conflito de horários
+     */
+    public function verificarDisponibilidade(int $profissional_id, string $dataHoraInicio, int $duracao): bool
+    {
+        // Calcula hora final do agendamento
+        $dataHoraFim = date('Y-m-d H:i:s', strtotime($dataHoraInicio) + ($duracao * 60));
+        
+        $stmt = $this->execute(
+            "SELECT COUNT(*) as total FROM agendamento
+             WHERE profissional_id = ? 
+             AND status != 'CANCELADO'
+             AND (
+                (data_hora_inicio < ? AND DATE_ADD(data_hora_inicio, INTERVAL tempo_total_minutos MINUTE) > ?)
+             )",
+            [$profissional_id, $dataHoraFim, $dataHoraInicio]
+        );
+        
+        return (int) $stmt->fetch(\PDO::FETCH_ASSOC)['total'] === 0;
     }
 
     /**
-     * Atualiza agendamento completo
+     * Salva novo agendamento
      */
-    public function atualizar(int $id, array $dados): bool
+    public function salvar(array $dados): int
     {
-        return $this->update("agendamento_id = {$id}", $dados);
-    }
-
-    /**
-     * Remove agendamento
-     */
-    public function remover(int $id): bool
-    {
-        return $this->delete("agendamento_id = {$id}");
+        $dados['status'] = $dados['status'] ?? 'AGENDADO';
+        return $this->insert($dados);
     }
 
     /**
