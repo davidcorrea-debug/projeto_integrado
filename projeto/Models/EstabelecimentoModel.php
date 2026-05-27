@@ -93,7 +93,32 @@ class EstabelecimentoModel extends Database
         );
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+    /**
+     * Verifica se está aberto em um dia/hora específico
+     */
+    public function estaAberto(int $estabelecimento_id, string $dataHora): bool
+    {
+        $dia = [
+            'domingo' => 'DOMINGO',
+            'monday' => 'SEGUNDA',
+            'tuesday' => 'TERCA',
+            'wednesday' => 'QUARTA',
+            'thursday' => 'QUINTA',
+            'friday' => 'SEXTA',
+            'saturday' => 'SABADO'
+        ];
+        $diaSemana = $dia[strtolower(date('l', strtotime($dataHora)))];
+        $hora = date('H:i', strtotime($dataHora));
 
+        $stmt = $this->execute(
+            "SELECT COUNT(*) as total FROM horario_funcionamento 
+             WHERE estabelecimento_id = ? AND dia_semana = ? AND ativo = 1
+             AND hora_abertura <= ? AND hora_fechamento > ?",
+            [$estabelecimento_id, $diaSemana, $hora, $hora]
+        );
+
+        return (int) $stmt->fetch(\PDO::FETCH_ASSOC)['total'] > 0;
+    }
 }
 
 
@@ -101,4 +126,3 @@ class EstabelecimentoModel extends Database
 
 
 
-?>
