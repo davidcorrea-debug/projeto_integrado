@@ -14,22 +14,21 @@ class AgendamentoModel extends Database
     /**
      * Lista agendamentos de uma data específica (padrão: hoje)
      */
-    public function listarPorData(string $data = ''): array
+   public function listarPorData(int $estabelecimento_id, string $data = ''): array
     {
         if (empty($data)) $data = date('Y-m-d');
 
         $stmt = $this->execute(
-            "SELECT a.*,
-                    c.cliente_nome, c.cliente_telefone,
-                    s.servico_nome, s.servico_duracao, s.servico_preco,
-                    u.usuario_nome AS profissional_nome
-             FROM agendamentos a
-             INNER JOIN clientes c  ON a.cliente_id  = c.cliente_id
-             INNER JOIN servicos s  ON a.servico_id  = s.servico_id
-             INNER JOIN usuarios u  ON a.usuario_id  = u.usuario_id
-             WHERE a.agendamento_data = ?
-             ORDER BY a.agendamento_hora ASC",
-            [$data]
+            "SELECT a.id, a.data_hora_inicio, a.status, a.tempo_total_minutos, a.valor_total,
+                    uc.nome as cliente_nome, uc.telefone as cliente_telefone,
+                    up.nome as profissional_nome, up.email as profissional_email,
+                    a.observacoes
+             FROM agendamento a
+             INNER JOIN usuario uc ON a.cliente_id = uc.id
+             INNER JOIN usuario up ON a.profissional_id = up.id
+             WHERE a.estabelecimento_id = ? AND DATE(a.data_hora_inicio) = ?
+             ORDER BY a.data_hora_inicio ASC",
+            [$estabelecimento_id, $data]
         );
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
