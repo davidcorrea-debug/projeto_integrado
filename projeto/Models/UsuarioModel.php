@@ -17,7 +17,7 @@ class UsuarioModel extends Database
     public function buscarPorEmail(string $email): ?array
     {
         $stmt = $this->execute(
-            "SELECT * FROM usuarios WHERE usuario_email = ? AND usuario_ativo = 1 LIMIT 1",
+            "SELECT id, nome, email, tipo_usuario, senha_hash, ativo FROM usuario WHERE email = ? AND ativo = 1 LIMIT 1",
             [$email]
         );
         $result = $stmt->fetch(\PDO::FETCH_ASSOC);
@@ -30,8 +30,7 @@ class UsuarioModel extends Database
     public function listar(): array
     {
         $stmt = $this->execute(
-            "SELECT usuario_id, usuario_nome, usuario_email, usuario_perfil, usuario_ativo, criado_em
-             FROM usuarios ORDER BY usuario_nome ASC"
+            "SELECT id, nome, email, tipo_usuario, ativo, data_criacao FROM usuario WHERE ativo = 1 ORDER BY nome ASC"
         );
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
@@ -42,8 +41,7 @@ class UsuarioModel extends Database
     public function buscarPorId(int $id): ?array
     {
         $stmt = $this->execute(
-            "SELECT usuario_id, usuario_nome, usuario_email, usuario_perfil, usuario_ativo
-             FROM usuarios WHERE usuario_id = ? LIMIT 1",
+            "SELECT id, nome, email, telefone, cpf_cnpj, tipo_usuario, ativo FROM usuario WHERE id = ? LIMIT 1",
             [$id]
         );
         $result = $stmt->fetch(\PDO::FETCH_ASSOC);
@@ -64,11 +62,11 @@ class UsuarioModel extends Database
      */
     public function atualizar(int $id, array $dados): bool
     {
-        if (!empty($dados['usuario_senha'])) {
-            $dados['usuario_senha'] = password_hash($dados['usuario_senha'], PASSWORD_DEFAULT);
+        if (!empty($dados['senha_hash'])) {
+            $dados['senha_hash'] = password_hash($dados['senha_hash'], PASSWORD_DEFAULT);
         } else {
-            unset($dados['usuario_senha']);
+            unset($dados['senha_hash']);
         }
-        return $this->update("usuario_id = {$id}", $dados);
+        return $this->update("id = {$id}", $dados);
     }
 }
