@@ -12,13 +12,13 @@ use Models\UsuarioModel;
 class AgendamentoController
 {
     private AgendamentoModel $model;
-    private ClienteModel     $clienteModel;
-    private ServicoModel     $servicoModel;
-    private UsuarioModel     $usuarioModel;
+    private ClienteModel $clienteModel;
+    private ServicoModel $servicoModel;
+    private UsuarioModel $usuarioModel;
 
     public function __construct()
     {
-        $this->model        = new AgendamentoModel();
+        $this->model = new AgendamentoModel();
         $this->clienteModel = new ClienteModel();
         $this->servicoModel = new ServicoModel();
         $this->usuarioModel = new UsuarioModel();
@@ -26,21 +26,21 @@ class AgendamentoController
 
     public function index(): void
     {
-        $data  = $_GET['data'] ?? date('Y-m-d');
-        $msg   = $_SESSION['msg'] ?? '';
+        $data = $_GET['data'] ?? date('Y-m-d');
+        $msg = $_SESSION['msg'] ?? '';
         unset($_SESSION['msg']);
 
         // Datas de navegação anterior/próxima
         $dataAnterior = date('Y-m-d', strtotime($data . ' -1 day'));
-        $dataProxima  = date('Y-m-d', strtotime($data . ' +1 day'));
+        $dataProxima = date('Y-m-d', strtotime($data . ' +1 day'));
 
         view('agendamentos/index', [
-            'pagina'        => 'Agendamentos',
-            'agendamentos'  => $this->model->listarPorData($data),
-            'data'          => $data,
-            'dataAnterior'  => $dataAnterior,
-            'dataProxima'   => $dataProxima,
-            'msg'           => $msg,
+            'pagina' => 'Agendamentos',
+            'agendamentos' => $this->model->listarPorData($data),
+            'data' => $data,
+            'dataAnterior' => $dataAnterior,
+            'dataProxima' => $dataProxima,
+            'msg' => $msg,
         ]);
     }
 
@@ -50,11 +50,11 @@ class AgendamentoController
         unset($_SESSION['msg']);
 
         view('agendamentos/form', [
-            'pagina'    => 'Novo Agendamento',
-            'clientes'  => $this->clienteModel->listar(),
-            'servicos'  => $this->servicoModel->listarAtivos(),
-            'usuarios'  => $this->usuarioModel->listar(),
-            'msg'       => $msg,
+            'pagina' => 'Novo Agendamento',
+            'clientes' => $this->clienteModel->listar(),
+            'servicos' => $this->servicoModel->listarAtivos(),
+            'usuarios' => $this->usuarioModel->listar(),
+            'msg' => $msg,
         ]);
     }
 
@@ -65,17 +65,19 @@ class AgendamentoController
         }
 
         $dados = [
-            'cliente_id'          => (int) ($_POST['cliente_id'] ?? 0),
-            'servico_id'          => (int) ($_POST['servico_id'] ?? 0),
-            'usuario_id'          => (int) ($_POST['usuario_id'] ?? 0),
-            'agendamento_data'    => $_POST['agendamento_data'] ?? '',
-            'agendamento_hora'    => $_POST['agendamento_hora'] ?? '',
-            'agendamento_obs'     => trim($_POST['agendamento_obs'] ?? ''),
-            'agendamento_status'  => 'aguardando',
+            'cliente_id' => (int) ($_POST['cliente_id'] ?? 0),
+            'servico_id' => (int) ($_POST['servico_id'] ?? 0),
+            ' id' => (int) ($_POST[' id'] ?? 0),
+            'agendamento_data' => $_POST['agendamento_data'] ?? '',
+            'agendamento_hora' => $_POST['agendamento_hora'] ?? '',
+            'agendamento_obs' => trim($_POST['agendamento_obs'] ?? ''),
+            'agendamento_status' => 'aguardando',
         ];
 
-        if (!$dados['cliente_id'] || !$dados['servico_id'] || !$dados['usuario_id']
-            || empty($dados['agendamento_data']) || empty($dados['agendamento_hora'])) {
+        if (
+            !$dados['cliente_id'] || !$dados['servico_id'] || !$dados[' id']
+            || empty($dados['agendamento_data']) || empty($dados['agendamento_hora'])
+        ) {
             $_SESSION['msg'] = msg('Preencha todos os campos obrigatórios.', 'danger');
             redirect('agendamentos/novo');
         }
