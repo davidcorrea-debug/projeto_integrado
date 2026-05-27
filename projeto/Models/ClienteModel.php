@@ -72,7 +72,10 @@ class ClienteModel extends Database
      */
     public function remover(int $id): bool
     {
-        return $this->delete("cliente_id = {$id}");
+        return $this->update(
+            "id = {$id} AND tipo_usuario = 'CLIENTE'",
+            ['ativo' => 0, 'deletado_em' => date('Y-m-d H:i:s')]
+        );
     }
 
     /**
@@ -80,7 +83,21 @@ class ClienteModel extends Database
      */
     public function total(): int
     {
-        $stmt = $this->execute("SELECT COUNT(*) as total FROM clientes");
+        $stmt = $this->execute("SELECT COUNT(*) as total FROM usuario WHERE tipo_usuario = 'CLIENTE' AND ativo = 1");
         return (int) $stmt->fetch(\PDO::FETCH_ASSOC)['total'];
+    }
+
+    /**
+     * Busca cliente por e-mail
+     */
+    public function buscarPorEmail(string $email): ?array
+    {
+        $stmt = $this->execute(
+            "SELECT id, nome, email, telefone, cpf_cnpj FROM usuario 
+             WHERE email = ? AND tipo_usuario = 'CLIENTE' AND ativo = 1 LIMIT 1",
+            [$email]
+        );
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $result ?: null;
     }
 }
