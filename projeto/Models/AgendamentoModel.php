@@ -39,15 +39,15 @@ class AgendamentoModel extends Database
     public function buscarPorId(int $id): ?array
     {
         $stmt = $this->execute(
-            "SELECT a.*,
-                    c.cliente_nome, c.cliente_telefone,
-                    s.servico_nome, s.servico_duracao, s.servico_preco,
-                    u.usuario_nome AS profissional_nome
-             FROM agendamentos a
-             INNER JOIN clientes c  ON a.cliente_id  = c.cliente_id
-             INNER JOIN servicos s  ON a.servico_id  = s.servico_id
-             INNER JOIN usuarios u  ON a.usuario_id  = u.usuario_id
-             WHERE a.agendamento_id = ? LIMIT 1",
+              "SELECT a.id, a.estabelecimento_id, a.cliente_id, a.profissional_id,
+                    a.data_hora_inicio, a.tempo_total_minutos, a.valor_total, 
+                    a.observacoes, a.status, a.cancelado_por, a.cancelado_motivo, a.cancelado_em,
+                    uc.nome as cliente_nome, uc.telefone as cliente_telefone,
+                    up.nome as profissional_nome, up.email as profissional_email
+             FROM agendamento a
+             INNER JOIN usuario uc ON a.cliente_id = uc.id
+             INNER JOIN usuario up ON a.profissional_id = up.id
+             WHERE a.id = ? LIMIT 1",
             [$id]
         );
         $result = $stmt->fetch(\PDO::FETCH_ASSOC);
@@ -55,11 +55,22 @@ class AgendamentoModel extends Database
     }
 
     /**
-     * Salva novo agendamento
+     * Lista agendamentos do cliente
      */
-    public function salvar(array $dados): int
+    public function listarPorCliente(int $cliente_id, string $status = 'AGENDADO'): array
     {
-        return $this->insert($dados);
+        $stmt = $this->execute(
+            "SELECT a.id, a.data_hora_inicio, a.status, a.valor_total, a.tempo_total_minutos,
+                    e.nome_fantasia as estabelecimento,
+                    up.nome as profissional_nome
+             FROM agendamento a
+             INNER JOIN estabelecimento e ON a.estabelecimento_id = e.id
+             INNER JOIN usuario up ON a.profissional_id = up.id
+             WHERE a.cliente_id = ? AND a.status = ? AND e.ativo = 1
+             ORDER BY a.data_hora_inicio DESC",
+            [$cliente_id, $status]
+        );
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     /**
