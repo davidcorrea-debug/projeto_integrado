@@ -14,9 +14,10 @@ class AgendamentoModel extends Database
     /**
      * Lista agendamentos de uma data específica (padrão: hoje)
      */
-   public function listarPorData(int $estabelecimento_id, string $data = ''): array
+    public function listarPorData(int $estabelecimento_id, string $data = ''): array
     {
-        if (empty($data)) $data = date('Y-m-d');
+        if (empty($data))
+            $data = date('Y-m-d');
 
         $stmt = $this->execute(
             "SELECT a.id, a.data_hora_inicio, a.status, a.tempo_total_minutos, a.valor_total,
@@ -39,7 +40,7 @@ class AgendamentoModel extends Database
     public function buscarPorId(int $id): ?array
     {
         $stmt = $this->execute(
-              "SELECT a.id, a.estabelecimento_id, a.cliente_id, a.profissional_id,
+            "SELECT a.id, a.estabelecimento_id, a.cliente_id, a.profissional_id,
                     a.data_hora_inicio, a.tempo_total_minutos, a.valor_total, 
                     a.observacoes, a.status, a.cancelado_por, a.cancelado_motivo, a.cancelado_em,
                     uc.nome as cliente_nome, uc.telefone as cliente_telefone,
@@ -78,7 +79,8 @@ class AgendamentoModel extends Database
      */
     public function listarPorProfissional(int $profissional_id, string $data = ''): array
     {
-        if (empty($data)) $data = date('Y-m-d');
+        if (empty($data))
+            $data = date('Y-m-d');
 
         $stmt = $this->execute(
             "SELECT a.id, a.data_hora_inicio, a.status, a.valor_total,
@@ -93,14 +95,14 @@ class AgendamentoModel extends Database
         );
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
-/**
+    /**
      * Verifica conflito de horários
      */
     public function verificarDisponibilidade(int $profissional_id, string $dataHoraInicio, int $duracao): bool
     {
         // Calcula hora final do agendamento
         $dataHoraFim = date('Y-m-d H:i:s', strtotime($dataHoraInicio) + ($duracao * 60));
-        
+
         $stmt = $this->execute(
             "SELECT COUNT(*) as total FROM agendamento
              WHERE profissional_id = ? 
@@ -110,7 +112,7 @@ class AgendamentoModel extends Database
              )",
             [$profissional_id, $dataHoraFim, $dataHoraInicio]
         );
-        
+
         return (int) $stmt->fetch(\PDO::FETCH_ASSOC)['total'] === 0;
     }
 
@@ -124,16 +126,59 @@ class AgendamentoModel extends Database
     }
 
     /**
+     * Atualiza status do agendamento
+     */
+    public function atualizarStatus(int $id, string $status): bool
+    {
+        return $this->update("id = {$id}", ['status' => $status, 'atualizado_em' => date('Y-m-d H:i:s')]);
+    }
+
+    /**
+     * Cancela agendamento
+     */
+    public function cancelar(int $id, string $canceladoPor, string $motivo): bool
+    {
+        return $this->update("id = {$id}", [
+            'status' => 'CANCELADO',
+            'cancelado_por' => $canceladoPor,
+            'cancelado_motivo' => $motivo,
+            'cancelado_em' => date('Y-m-d H:i:s'),
+            'atualizado_em' => date('Y-m-d H:i:s')
+        ]);
+    }
+
+    /**
+     * Atualiza agendamento completo
+     */
+    public function atualizar(int $id, array $dados): bool
+    {
+        $dados['atualizado_em'] = date('Y-m-d H:i:s');
+        return $this->update("id = {$id}", $dados);
+    }
+    /**
      * Total de agendamentos de hoje
      */
-    public function totalHoje(): int
+    public function totalHoje(int $estabelecimento_id): int
     {
         $stmt = $this->execute(
-            "SELECT COUNT(*) as total FROM agendamentos WHERE agendamento_data = CURDATE()"
+            "SELECT COUNT(*) as total FROM agendamento 
+             WHERE estabelecimento_id = ? AND DATE(data_hora_inicio) = CURDATE() AND status != 'CANCELADO'",
+            [$estabelecimento_id]
         );
         return (int) $stmt->fetch(\PDO::FETCH_ASSOC)['total'];
     }
-
+    /**
+     * Total de agendamentos concluídos
+     */
+    public function totalConcluidos(int $estabelecimento_id): int
+    {
+        $stmt = $this->execute(
+            "SELECT COUNT(*) as total FROM agendamento 
+             WHERE estabelecimento_id = ? AND status = 'CONCLUIDO'",
+            [$estabelecimento_id]
+        );
+        return (int) $stmt->fetch(\PDO::FETCH_ASSOC)['total'];
+    }
     /**
      * Receita do dia atual (somente concluídos)
      */
@@ -148,7 +193,6 @@ class AgendamentoModel extends Database
         );
         return (float) $stmt->fetch(\PDO::FETCH_ASSOC)['total'];
     }
-
     /**
      * Receita do mês atual (somente concluídos)
      */
