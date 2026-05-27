@@ -31,6 +31,24 @@ class EstabelecimentoModel extends Database
         }
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+    /**
+     * Busca estabelecimento por ID
+     */
+    public function buscarPorId(int $id): ?array
+    {
+        $stmt = $this->execute(
+            "SELECT e.*, ee.cep, ee.rua, ee.bairro, ee.numero, ee.complemento, c.nome as cidade, st.uf
+             FROM estabelecimento e
+             LEFT JOIN endereco_estabelecimento ee ON e.id = ee.estabelecimento_id
+             LEFT JOIN cidade c ON ee.cidade_id = c.id
+             LEFT JOIN estado st ON c.estado_id = st.id
+             WHERE e.id = ? LIMIT 1",
+            [$id]
+        );
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $result ?: null;
+    }
+
 
 }
 
