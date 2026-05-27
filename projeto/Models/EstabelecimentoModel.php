@@ -48,7 +48,51 @@ class EstabelecimentoModel extends Database
         $result = $stmt->fetch(\PDO::FETCH_ASSOC);
         return $result ?: null;
     }
+    /**
+     * Salva novo estabelecimento
+     */
+    public function salvar(array $dados): int
+    {
+        $dados['ativo'] = $dados['ativo'] ?? 1;
+        return $this->insert($dados);
+    }
 
+    /**
+     * Atualiza estabelecimento
+     */
+    public function atualizar(int $id, array $dados): bool
+    {
+        return $this->update("id = {$id}", $dados);
+    }
+
+    /**
+     * Soft delete do estabelecimento
+     */
+    public function remover(int $id): bool
+    {
+        return $this->update("id = {$id}", ['ativo' => 0, 'deletado_em' => date('Y-m-d H:i:s')]);
+    }
+    /**
+     * Total de estabelecimentos ativos
+     */
+    public function total(): int
+    {
+        $stmt = $this->execute("SELECT COUNT(*) as total FROM estabelecimento WHERE ativo = 1");
+        return (int) $stmt->fetch(\PDO::FETCH_ASSOC)['total'];
+    }
+    /**
+     * Busca horários de funcionamento
+     */
+    public function buscarHorarios(int $estabelecimento_id): array
+    {
+        $stmt = $this->execute(
+            "SELECT dia_semana, hora_abertura, hora_fechamento, ativo 
+             FROM horario_funcionamento 
+             WHERE estabelecimento_id = ? ORDER BY FIELD(dia_semana, 'SEGUNDA', 'TERCA', 'QUARTA', 'QUINTA', 'SEXTA', 'SABADO', 'DOMINGO')",
+            [$estabelecimento_id]
+        );
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
 
 }
 
