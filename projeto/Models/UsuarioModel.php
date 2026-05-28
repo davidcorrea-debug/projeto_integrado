@@ -69,4 +69,40 @@ class UsuarioModel extends Database
         }
         return $this->update("id = {$id}", $dados);
     }
+    /**
+     * Verifica se e-mail já existe
+     */
+    public function emailExiste(string $email, int $idExcluir = 0): bool
+    {
+        $sql = "SELECT COUNT(*) as total FROM usuario WHERE email = ? AND ativo = 1";
+        $params = [$email];
+
+        if ($idExcluir > 0) {
+            $sql .= " AND id != ?";
+            $params[] = $idExcluir;
+        }
+
+        $stmt = $this->execute($sql, $params);
+        return (int) $stmt->fetch(\PDO::FETCH_ASSOC)['total'] > 0;
+    }
+    /**
+     * Listar usuários por tipo (ADMIN, PROFISSIONAL, CLIENTE)
+     */
+    public function listarPorTipo(string $tipo): array
+    {
+        $stmt = $this->execute(
+            "SELECT id, nome, email, tipo_usuario, ativo FROM usuario WHERE tipo_usuario = ? AND ativo = 1 ORDER BY nome ASC",
+            [$tipo]
+        );
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Total de usuários ativos
+     */
+    public function total(): int
+    {
+        $stmt = $this->execute("SELECT COUNT(*) as total FROM usuario WHERE ativo = 1");
+        return (int) $stmt->fetch(\PDO::FETCH_ASSOC)['total'];
+    }
 }
