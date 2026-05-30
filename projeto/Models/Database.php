@@ -13,7 +13,7 @@ class Database{
   const HOST = 'mysql';
 
   # Nome do banco de dados (criado automaticamente pelo Docker)
-  const NAME = ' glowagenda';
+  const NAME = ' aluno';
 
   # Usuário do banco
   const USER = 'aluno';
