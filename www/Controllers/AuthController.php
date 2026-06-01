@@ -30,21 +30,27 @@ class AuthController
      */
     public function authenticate(): void
     {
+        error_log('[AUTH] authenticate start method=' . ($_SERVER['REQUEST_METHOD'] ?? '') . ' uri=' . ($_SERVER['REQUEST_URI'] ?? ''));
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            error_log('[AUTH] invalid method, redirecting to login');
             redirect('login');
         }
 
         $email = trim($_POST['email'] ?? '');
         $senha = $_POST['senha'] ?? '';
+        error_log('[AUTH] received email=' . $email . ' senha_len=' . strlen($senha));
 
         if (empty($email) || empty($senha)) {
+            error_log('[AUTH] missing email or password');
             $_SESSION['login_erro'] = 'Preencha e-mail e senha.';
             redirect('login');
         }
 
         $usuario = $this->model->buscarPorEmail($email);
+        error_log('[AUTH] lookup result found=' . ($usuario ? '1' : '0') . ($usuario ? (' keys=' . implode(',', array_keys($usuario))) : ''));
 
         if (!$usuario || !password_verify($senha, $usuario['usuario_senha'])) {
+            error_log('[AUTH] invalid credentials for email=' . $email);
             $_SESSION['login_erro'] = 'E-mail ou senha inválidos.';
             redirect('login');
         }
@@ -53,6 +59,8 @@ class AuthController
         $_SESSION['usuario_id']     = $usuario['usuario_id'];
         $_SESSION['usuario_nome']   = $usuario['usuario_nome'];
         $_SESSION['usuario_perfil'] = $usuario['usuario_perfil'];
+
+        error_log('[AUTH] login success id=' . $_SESSION['usuario_id'] . ' nome=' . $_SESSION['usuario_nome'] . ' perfil=' . $_SESSION['usuario_perfil']);
 
         redirect('dashboard');
     }

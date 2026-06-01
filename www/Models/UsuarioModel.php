@@ -16,12 +16,19 @@ class UsuarioModel extends Database
      */
     public function buscarPorEmail(string $email): ?array
     {
-        $stmt = $this->execute(
-            "SELECT * FROM usuarios WHERE usuario_email = ? AND usuario_ativo = 1 LIMIT 1",
-            [$email]
-        );
-        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
-        return $result ?: null;
+        error_log('[USERMODEL] buscarPorEmail email=' . $email);
+        try {
+            $stmt = $this->execute(
+                "SELECT * FROM usuarios WHERE usuario_email = ? AND usuario_ativo = 1 LIMIT 1",
+                [$email]
+            );
+            $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+            error_log('[USERMODEL] buscarPorEmail found=' . ($result ? '1' : '0') . ($result ? (' keys=' . implode(',', array_keys($result))) : ''));
+            return $result ?: null;
+        } catch (\Throwable $e) {
+            error_log('[USERMODEL] buscarPorEmail exception: ' . $e->getMessage());
+            throw $e;
+        }
     }
 
     /**

@@ -51,6 +51,7 @@ class Database{
         ]
       );
     }catch(PDOException $e){
+      error_log('[DB] connection error: ' . $e->getMessage());
       throw $e;
     }
   }
