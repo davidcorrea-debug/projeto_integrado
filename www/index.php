@@ -3,6 +3,9 @@
 ob_start();
 session_start();
 
+// Força o cabeçalho de resposta HTTP para UTF-8 para garantir caracteres especiais como ç e acentos
+header('Content-Type: text/html; charset=utf-8');
+
 include_once 'Config/Helpers.php';
 include_once 'Autoloader.php';
 
