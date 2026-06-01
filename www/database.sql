@@ -11,14 +11,14 @@ SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ============================================================
--- Tabela: usuarios (Admin / Proprietário / Atendente)
+-- Tabela: usuarios (Admin / Profissional / Cliente)
 -- ============================================================
 CREATE TABLE IF NOT EXISTS `usuarios` (
     `usuario_id`     INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `usuario_nome`   VARCHAR(100) NOT NULL,
     `usuario_email`  VARCHAR(150) NOT NULL UNIQUE,
     `usuario_senha`  VARCHAR(255) NOT NULL,
-    `usuario_perfil` ENUM('admin','proprietario','atendente') NOT NULL DEFAULT 'atendente',
+    `usuario_perfil` ENUM('admin','profissional','cliente') NOT NULL DEFAULT 'cliente',
     `usuario_ativo`  TINYINT(1) NOT NULL DEFAULT 1,
     `criado_em`      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `atualizado_em`  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
