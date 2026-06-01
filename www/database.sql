@@ -94,8 +94,11 @@ INSERT INTO `categorias` (`categoria_nome`) VALUES
 -- ============================================================
 -- Dados iniciais: Usuário Admin (senha: admin123)
 -- ============================================================
-INSERT INTO `usuarios` (`usuario_nome`, `usuario_email`, `usuario_senha`, `usuario_perfil`) VALUES
-    ('Administrador', 'admin@glowagenda.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
+INSERT INTO `usuarios` (`usuario_nome`, `usuario_email`, `usuario_senha`, `usuario_perfil`)
+VALUES ('Administrador', 'admin@glowagenda.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin')
+ON DUPLICATE KEY UPDATE
+  `usuario_nome` = VALUES(`usuario_nome`),
+  `usuario_perfil` = VALUES(`usuario_perfil`);
 
 -- ============================================================
 -- Dados iniciais: Serviços de exemplo
