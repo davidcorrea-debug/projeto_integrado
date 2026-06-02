@@ -44,6 +44,9 @@
                     </div>
 
                     <button class="w-100 btn btn-lg btn-primary rounded-pill fw-medium" type="submit">Entrar no sistema</button>
+                    <div class="mt-3">
+                        <a href="<?php echo base_url('forgot-password'); ?>" class="small">Esqueci minha senha</a>
+                    </div>
                     <p class="mt-4 mb-3 text-muted">&copy; 2026 — Glow Agenda</p>
                 </form>
             </div>
