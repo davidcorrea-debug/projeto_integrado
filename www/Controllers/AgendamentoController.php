@@ -34,9 +34,22 @@ class AgendamentoController
         $dataAnterior = date('Y-m-d', strtotime($data . ' -1 day'));
         $dataProxima  = date('Y-m-d', strtotime($data . ' +1 day'));
 
+        // RBAC: filtrar lista por perfil
+        if (function_exists('hasRole') && function_exists('currentUserId')) {
+            if (hasRole(['admin'])) {
+                $agendamentos = $this->model->listarPorData($data);
+            } elseif (hasRole(['profissional'])) {
+                $agendamentos = $this->model->listarPorDataProfissional($data, currentUserId());
+            } else { // cliente
+                $agendamentos = $this->model->listarPorDataCliente($data, currentUserId());
+            }
+        } else {
+            $agendamentos = $this->model->listarPorData($data);
+        }
+
         view('agendamentos/index', [
             'pagina'        => 'Agendamentos',
-            'agendamentos'  => $this->model->listarPorData($data),
+            'agendamentos'  => $agendamentos,
             'data'          => $data,
             'dataAnterior'  => $dataAnterior,
             'dataProxima'   => $dataProxima,
@@ -48,12 +61,22 @@ class AgendamentoController
     {
         $msg = $_SESSION['msg'] ?? '';
         unset($_SESSION['msg']);
+        // Se for cliente, restringe a si mesmo na lista de clientes
+        $clientes = $this->clienteModel->listar();
+        if (function_exists('hasRole') && hasRole(['cliente'])) {
+            $email = $_SESSION['usuario_email'] ?? '';
+            $cli = $this->clienteModel->buscarPorUsuarioId((int)($_SESSION['usuario_id'] ?? 0), $email);
+            $clientes = $cli ? [$cli] : [];
+            if (!$cli) {
+                $_SESSION['msg'] = msg('Seu usuário não está vinculado a um cliente pelo mesmo e-mail. Contate o suporte.', 'danger');
+            }
+        }
 
         view('agendamentos/form', [
             'pagina'    => 'Novo Agendamento',
-            'clientes'  => $this->clienteModel->listar(),
+            'clientes'  => $clientes,
             'servicos'  => $this->servicoModel->listarAtivos(),
-            'usuarios'  => $this->usuarioModel->listar(),
+            'usuarios'  => (method_exists($this->usuarioModel, 'listarPorTipo') ? $this->usuarioModel->listarPorTipo('profissional') : $this->usuarioModel->listar()),
             'msg'       => $msg,
         ]);
     }
@@ -63,6 +86,9 @@ class AgendamentoController
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             redirect('agendamentos');
         }
+        // Regra: admin/profissional podem criar livremente; cliente pode criar apenas para si
+        $isCliente = function_exists('hasRole') && hasRole(['cliente']);
+        if (!$isCliente && function_exists('requireRole')) requireRole(['admin','profissional']);
 
         $dados = [
             'cliente_id'          => (int) ($_POST['cliente_id'] ?? 0),
@@ -73,6 +99,23 @@ class AgendamentoController
             'agendamento_obs'     => trim($_POST['agendamento_obs'] ?? ''),
             'agendamento_status'  => 'aguardando',
         ];
+
+        // Se for cliente, força o cliente_id para o do usuário logado e valida profissional
+        if ($isCliente) {
+            $email = $_SESSION['usuario_email'] ?? '';
+            $cli = $this->clienteModel->buscarPorUsuarioId((int)($_SESSION['usuario_id'] ?? 0), $email);
+            if (!$cli) {
+                $_SESSION['msg'] = msg('Seu usuário não está vinculado a um cliente pelo mesmo e-mail. Contate o suporte.', 'danger');
+                redirect('agendamentos/novo');
+            }
+            $dados['cliente_id'] = (int)$cli['cliente_id'];
+            // valida se usuario_id escolhido é profissional
+            $prof = $this->usuarioModel->buscarPorId((int)$dados['usuario_id']);
+            if (!$prof || ($prof['usuario_perfil'] ?? '') !== 'profissional') {
+                $_SESSION['msg'] = msg('Selecione um profissional válido.', 'danger');
+                redirect('agendamentos/novo');
+            }
+        }
 
         if (!$dados['cliente_id'] || !$dados['servico_id'] || !$dados['usuario_id']
             || empty($dados['agendamento_data']) || empty($dados['agendamento_hora'])) {
@@ -87,6 +130,7 @@ class AgendamentoController
 
     public function status(int $id): void
     {
+        if (function_exists('requireRole')) requireRole(['admin','profissional']);
         $novoStatus = $_POST['status'] ?? '';
         $statusValidos = ['aguardando', 'confirmado', 'em_andamento', 'concluido', 'cancelado'];
 
@@ -101,6 +145,7 @@ class AgendamentoController
 
     public function excluir(int $id): void
     {
+        if (function_exists('requireRole')) requireRole(['admin','profissional']);
         $this->model->remover($id);
         $_SESSION['msg'] = msg('Agendamento removido.', 'warning');
         redirect('agendamentos');

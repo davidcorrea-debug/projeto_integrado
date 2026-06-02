@@ -35,6 +35,69 @@ class AgendamentoModel extends Database
     }
 
     /**
+     * Lista agendamentos de uma data para um profissional específico (usuario_id)
+     */
+    public function listarPorDataProfissional(string $data, int $usuarioId): array
+    {
+        $stmt = $this->execute(
+            "SELECT a.*,
+                    c.cliente_nome, c.cliente_telefone,
+                    s.servico_nome, s.servico_duracao, s.servico_preco,
+                    u.usuario_nome AS profissional_nome
+             FROM agendamentos a
+             INNER JOIN clientes c  ON a.cliente_id  = c.cliente_id
+             INNER JOIN servicos s  ON a.servico_id  = s.servico_id
+             INNER JOIN usuarios u  ON a.usuario_id  = u.usuario_id
+             WHERE a.agendamento_data = ? AND a.usuario_id = ?
+             ORDER BY a.agendamento_hora ASC",
+            [$data, $usuarioId]
+        );
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Lista agendamentos de uma data para um cliente (mapeado pelo usuario_id via e-mail do usuário = e-mail do cliente)
+     * OBS: idealmente deve haver FK clientes.cliente_usuario_id; esta é uma estratégia provisória.
+     */
+    public function listarPorDataCliente(string $data, int $usuarioId): array
+    {
+        // Primeiro tenta pelo vínculo cliente_usuario_id
+        try {
+            $stmt = $this->execute(
+                "SELECT a.*,
+                        c.cliente_nome, c.cliente_telefone,
+                        s.servico_nome, s.servico_duracao, s.servico_preco,
+                        u.usuario_nome AS profissional_nome
+                 FROM agendamentos a
+                 INNER JOIN clientes c  ON a.cliente_id  = c.cliente_id
+                 INNER JOIN servicos s  ON a.servico_id  = s.servico_id
+                 INNER JOIN usuarios u  ON a.usuario_id  = u.usuario_id
+                 WHERE a.agendamento_data = ? AND c.cliente_usuario_id = ?
+                 ORDER BY a.agendamento_hora ASC",
+                [$data, $usuarioId]
+            );
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        } catch (\Throwable $e) {
+            // Fallback: mapear por e-mail (ucli.email = c.email)
+            $stmt = $this->execute(
+                "SELECT a.*,
+                        c.cliente_nome, c.cliente_telefone,
+                        s.servico_nome, s.servico_duracao, s.servico_preco,
+                        u.usuario_nome AS profissional_nome
+                 FROM agendamentos a
+                 INNER JOIN clientes c  ON a.cliente_id  = c.cliente_id
+                 INNER JOIN servicos s  ON a.servico_id  = s.servico_id
+                 INNER JOIN usuarios u  ON a.usuario_id  = u.usuario_id
+                 INNER JOIN usuarios ucli ON ucli.usuario_email = c.cliente_email
+                 WHERE a.agendamento_data = ? AND ucli.usuario_id = ?
+                 ORDER BY a.agendamento_hora ASC",
+                [$data, $usuarioId]
+            );
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        }
+    }
+
+    /**
      * Busca agendamento por ID (com joins)
      */
     public function buscarPorId(int $id): ?array

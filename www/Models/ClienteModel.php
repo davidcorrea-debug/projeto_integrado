@@ -45,6 +45,41 @@ class ClienteModel extends Database
     }
 
     /**
+     * Busca cliente por e-mail (usado para vincular o usuário cliente)
+     */
+    public function buscarPorEmail(string $email): ?array
+    {
+        $stmt = $this->execute(
+            "SELECT * FROM clientes WHERE cliente_email = ? LIMIT 1",
+            [$email]
+        );
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $result ?: null;
+    }
+
+    /**
+     * Busca cliente vinculado a um usuario_id (FK clientes.cliente_usuario_id)
+     * Se a coluna não existir, opcionalmente tenta por e-mail.
+     */
+    public function buscarPorUsuarioId(int $usuarioId, ?string $usuarioEmail = null): ?array
+    {
+        try {
+            $stmt = $this->execute(
+                "SELECT * FROM clientes WHERE cliente_usuario_id = ? LIMIT 1",
+                [$usuarioId]
+            );
+            $r = $stmt->fetch(\PDO::FETCH_ASSOC);
+            if ($r) return $r;
+        } catch (\Throwable $e) {
+            // fallback quando a coluna ainda não existe no banco
+        }
+        if ($usuarioEmail) {
+            return $this->buscarPorEmail($usuarioEmail);
+        }
+        return null;
+    }
+
+    /**
      * Salva novo cliente
      */
     public function salvar(array $dados): int

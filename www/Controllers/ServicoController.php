@@ -20,6 +20,7 @@ class ServicoController
 
     public function index(): void
     {
+        if (function_exists('requireRole')) requireRole(['admin','profissional']);
         $busca      = trim($_GET['busca'] ?? '');
         $categoria  = $_GET['categoria'] ?? '';
         $ativo      = $_GET['ativo'] ?? '';
@@ -39,6 +40,7 @@ class ServicoController
 
     public function novo(): void
     {
+        if (function_exists('requireRole')) requireRole(['admin','profissional']);
         $msg = $_SESSION['msg'] ?? '';
         unset($_SESSION['msg']);
         view('servicos/form', [
@@ -54,6 +56,7 @@ class ServicoController
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             redirect('servicos');
         }
+        if (function_exists('requireRole')) requireRole(['admin','profissional']);
 
         $dados = [
             'servico_nome'      => trim($_POST['servico_nome'] ?? ''),
@@ -76,6 +79,7 @@ class ServicoController
 
     public function editar(int $id): void
     {
+        if (function_exists('requireRole')) requireRole(['admin','profissional']);
         $servico = $this->model->buscarPorId($id);
         if (!$servico) redirect('servicos');
         $msg = $_SESSION['msg'] ?? '';
@@ -93,6 +97,7 @@ class ServicoController
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             redirect('servicos');
         }
+        if (function_exists('requireRole')) requireRole(['admin','profissional']);
 
         $dados = [
             'servico_nome'      => trim($_POST['servico_nome'] ?? ''),
@@ -110,6 +115,7 @@ class ServicoController
 
     public function excluir(int $id): void
     {
+        if (function_exists('requireRole')) requireRole(['admin','profissional']);
         $this->model->remover($id);
         $_SESSION['msg'] = msg('Serviço removido.', 'warning');
         redirect('servicos');

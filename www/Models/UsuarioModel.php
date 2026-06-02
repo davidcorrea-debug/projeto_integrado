@@ -44,6 +44,19 @@ class UsuarioModel extends Database
     }
 
     /**
+     * Listar usuários por perfil (admin, profissional, cliente)
+     */
+    public function listarPorTipo(string $tipo): array
+    {
+        $stmt = $this->execute(
+            "SELECT usuario_id, usuario_nome, usuario_email, usuario_perfil, usuario_ativo
+             FROM usuarios WHERE usuario_perfil = ? AND usuario_ativo = 1 ORDER BY usuario_nome ASC",
+            [$tipo]
+        );
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    /**
      * Busca usuário por ID
      */
     public function buscarPorId(int $id): ?array
@@ -77,5 +90,14 @@ class UsuarioModel extends Database
             unset($dados['usuario_senha']);
         }
         return $this->update("usuario_id = {$id}", $dados);
+    }
+
+    /**
+     * Atualiza apenas a senha do usuário (usado na recuperação de senha)
+     */
+    public function atualizarSenha(int $id, string $senhaPura): bool
+    {
+        $hash = password_hash($senhaPura, PASSWORD_DEFAULT);
+        return $this->update("usuario_id = {$id}", ['usuario_senha' => $hash]);
     }
 }
