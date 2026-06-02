@@ -8,6 +8,10 @@ return [
     '/login'                        => ['AuthController', 'login'],
     '/logout'                       => ['AuthController', 'logout'],
     '/auth/authenticate'            => ['AuthController', 'authenticate'],
+    '/forgot-password'              => ['AuthController', 'forgot'],
+    '/auth/send-reset'              => ['AuthController', 'sendReset'],
+    '/reset-password'               => ['AuthController', 'resetForm'],
+    '/auth/reset'                   => ['AuthController', 'reset'],
 
     // Dashboard
     '/dashboard'                    => ['DashboardController', 'index'],
