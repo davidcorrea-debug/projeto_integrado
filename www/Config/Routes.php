@@ -38,5 +38,10 @@ return [
     '/clientes/editar/{id}'         => ['ClienteController', 'editar'],
     '/clientes/atualizar/{id}'      => ['ClienteController', 'atualizar'],
     '/clientes/excluir/{id}'        => ['ClienteController', 'excluir'],
+
+    // Profissionais
+    '/profissionais'                => ['ProfissionalController', 'index'],
+    '/profissionais/novo'           => ['ProfissionalController', 'novo'],
+    '/profissionais/salvar'         => ['ProfissionalController', 'salvar'],
 ];
 
