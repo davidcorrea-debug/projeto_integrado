@@ -25,6 +25,18 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ============================================================
+-- Tabela: password_resets (tokens de recuperação de senha)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS `password_resets` (
+    `id`           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `usuario_id`   INT UNSIGNED NOT NULL,
+    `token_hash`   CHAR(64) NOT NULL UNIQUE,
+    `expires_at`   DATETIME NOT NULL,
+    `criado_em`    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`usuario_id`) REFERENCES `usuarios`(`usuario_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================================
 -- Tabela: categorias (ex: Cabelo, Coloração, Tratamento...)
 -- ============================================================
 CREATE TABLE IF NOT EXISTS `categorias` (
@@ -58,7 +70,9 @@ CREATE TABLE IF NOT EXISTS `clientes` (
     `cliente_telefone`  VARCHAR(20),
     `cliente_nascimento` DATE,
     `cliente_obs`       TEXT,
-    `criado_em`         DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    `cliente_usuario_id` INT UNSIGNED NULL,
+    `criado_em`         DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`cliente_usuario_id`) REFERENCES `usuarios`(`usuario_id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ============================================================

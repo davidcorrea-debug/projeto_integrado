@@ -7,6 +7,7 @@ session_start();
 header('Content-Type: text/html; charset=utf-8');
 
 include_once 'Config/Helpers.php';
+include_once 'Config/Security.php';
 include_once 'Autoloader.php';
 
 // Carrega as rotas
@@ -17,7 +18,7 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = rtrim($uri, '/') ?: '/';
 
 // Rotas que NÃO precisam de autenticação nem de layout de painel
-$rotasPublicas = ['/login', '/auth/authenticate'];
+$rotasPublicas = ['/login', '/auth/authenticate', '/forgot-password', '/auth/send-reset', '/reset-password', '/auth/reset'];
 
 // Se não está logado e a rota não é pública → redireciona para login
 if (!isLoggedIn() && !in_array($uri, $rotasPublicas) && $uri !== '/') {
