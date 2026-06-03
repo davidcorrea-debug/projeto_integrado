@@ -21,8 +21,9 @@ class AuthController
      */
     public function login(): void
     {
-        $erro = $_SESSION['login_erro'] ?? '';
-        unset($_SESSION['login_erro']);
+        $erro    = $_SESSION['login_erro'] ?? '';
+        $sucesso = $_SESSION['login_sucesso'] ?? '';
+        unset($_SESSION['login_erro'], $_SESSION['login_sucesso']);
         include("Views/auth/login.php");
     }
 
@@ -64,7 +65,11 @@ class AuthController
 
         error_log('[AUTH] login success id=' . $_SESSION['usuario_id'] . ' nome=' . $_SESSION['usuario_nome'] . ' perfil=' . $_SESSION['usuario_perfil']);
 
-        redirect('dashboard');
+        $destino = ($_SESSION['usuario_perfil'] ?? '') === 'cliente'
+            ? 'cliente/agendamentos'
+            : 'dashboard';
+
+        redirect($destino);
     }
 
     /**
