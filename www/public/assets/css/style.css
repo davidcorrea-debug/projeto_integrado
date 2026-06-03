@@ -54,10 +54,12 @@ body {
     #sidebar-wrapper {
         margin-left: 0;
     }
+
     #page-content-wrapper {
         min-width: 0;
         width: 100%;
     }
+
     #wrapper.toggled #sidebar-wrapper {
         margin-left: -250px;
     }
@@ -72,11 +74,79 @@ body {
 
 .card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 .5rem 1rem rgba(0,0,0,.08)!important;
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .08) !important;
 }
 
 /* Form inputs rounded */
-.form-control, .form-select {
+.form-control,
+.form-select {
     border-radius: 0.5rem;
     padding: 0.6rem 1rem;
+}
+
+/* Melhorias para formulários */
+.form-control-lg,
+.form-select-lg {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #d63384;
+    box-shadow: 0 0 0 3px rgba(214, 51, 132, 0.1);
+}
+
+.form-label {
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+/* Botões melhorados */
+.btn-primary {
+    background: linear-gradient(135deg, #d63384 0%, #b02a6c 100%);
+    border: none;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(214, 51, 132, 0.3);
+}
+
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+}
+
+/* Cards de informação */
+.alert-light {
+    background-color: #f8f9fa !important;
+    border-color: #d63384 !important;
+}
+
+/* Seções dos formulários */
+.card-header {
+    background: linear-gradient(135deg, #d63384 0%, #b02a6c 100%) !important;
+    border: none !important;
+    color: white !important;
+}
+
+/* Melhorias visuais gerais */
+.badge {
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+}
+
+.rounded-circle {
+    background: linear-gradient(135deg, #d63384 0%, #b02a6c 100%);
+}
+
+/* Animação suave */
+* {
+    transition: color 0.3s ease, background-color 0.3s ease;
 }
