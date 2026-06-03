@@ -6,9 +6,9 @@ use Models\Database;
 
 class ClienteModel extends Database
 {
-    public function __construct()
+    public function __construct(?\PDO $connection = null)
     {
-        parent::__construct('clientes');
+        parent::__construct('clientes', $connection);
     }
 
     /**

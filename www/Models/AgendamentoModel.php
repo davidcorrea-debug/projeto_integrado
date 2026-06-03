@@ -98,6 +98,72 @@ class AgendamentoModel extends Database
     }
 
     /**
+     * Lista próximos agendamentos do cliente (a partir de agora)
+     */
+    public function listarProximosPorCliente(int $clienteId): array
+    {
+        $stmt = $this->execute(
+            "SELECT a.*,
+                    c.cliente_nome, c.cliente_telefone,
+                    s.servico_nome, s.servico_duracao, s.servico_preco,
+                    u.usuario_nome AS profissional_nome
+             FROM agendamentos a
+             INNER JOIN clientes c ON a.cliente_id = c.cliente_id
+             INNER JOIN servicos s ON a.servico_id = s.servico_id
+             INNER JOIN usuarios u ON a.usuario_id = u.usuario_id
+             WHERE a.cliente_id = ?
+               AND TIMESTAMP(a.agendamento_data, a.agendamento_hora) >= NOW()
+             ORDER BY a.agendamento_data ASC, a.agendamento_hora ASC",
+            [$clienteId]
+        );
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Lista histórico de agendamentos (datas passadas) do cliente
+     */
+    public function listarHistoricoPorCliente(int $clienteId): array
+    {
+        $stmt = $this->execute(
+            "SELECT a.*,
+                    c.cliente_nome, c.cliente_telefone,
+                    s.servico_nome, s.servico_duracao, s.servico_preco,
+                    u.usuario_nome AS profissional_nome
+             FROM agendamentos a
+             INNER JOIN clientes c ON a.cliente_id = c.cliente_id
+             INNER JOIN servicos s ON a.servico_id = s.servico_id
+             INNER JOIN usuarios u ON a.usuario_id = u.usuario_id
+             WHERE a.cliente_id = ?
+               AND TIMESTAMP(a.agendamento_data, a.agendamento_hora) < NOW()
+             ORDER BY a.agendamento_data DESC, a.agendamento_hora DESC",
+            [$clienteId]
+        );
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Busca agendamento por ID garantindo vínculo com o cliente
+     */
+    public function buscarPorIdDoCliente(int $id, int $clienteId): ?array
+    {
+        $stmt = $this->execute(
+            "SELECT a.*,
+                    c.cliente_nome, c.cliente_telefone,
+                    s.servico_nome, s.servico_duracao, s.servico_preco,
+                    u.usuario_nome AS profissional_nome
+             FROM agendamentos a
+             INNER JOIN clientes c ON a.cliente_id = c.cliente_id
+             INNER JOIN servicos s ON a.servico_id = s.servico_id
+             INNER JOIN usuarios u ON a.usuario_id = u.usuario_id
+             WHERE a.agendamento_id = ? AND a.cliente_id = ?
+             LIMIT 1",
+            [$id, $clienteId]
+        );
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $result ?: null;
+    }
+
+    /**
      * Busca agendamento por ID (com joins)
      */
     public function buscarPorId(int $id): ?array
