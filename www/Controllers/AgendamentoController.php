@@ -26,6 +26,9 @@ class AgendamentoController
 
     public function index(): void
     {
+        if (function_exists('hasRole') && hasRole(['cliente'])) {
+            redirect('cliente/agendamentos');
+        }
         $data  = $_GET['data'] ?? date('Y-m-d');
         $msg   = $_SESSION['msg'] ?? '';
         unset($_SESSION['msg']);
@@ -59,6 +62,9 @@ class AgendamentoController
 
     public function novo(): void
     {
+        if (function_exists('hasRole') && hasRole(['cliente'])) {
+            redirect('cliente/agendamentos/novo');
+        }
         $msg = $_SESSION['msg'] ?? '';
         unset($_SESSION['msg']);
         // Se for cliente, restringe a si mesmo na lista de clientes
@@ -83,6 +89,9 @@ class AgendamentoController
 
     public function salvar(): void
     {
+        if (function_exists('hasRole') && hasRole(['cliente'])) {
+            redirect('cliente/agendamentos');
+        }
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             redirect('agendamentos');
         }
