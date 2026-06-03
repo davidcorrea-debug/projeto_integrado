@@ -18,7 +18,16 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $uri = rtrim($uri, '/') ?: '/';
 
 // Rotas que NÃO precisam de autenticação nem de layout de painel
-$rotasPublicas = ['/login', '/auth/authenticate', '/forgot-password', '/auth/send-reset', '/reset-password', '/auth/reset'];
+$rotasPublicas = [
+    '/login',
+    '/auth/authenticate',
+    '/forgot-password',
+    '/auth/send-reset',
+    '/reset-password',
+    '/auth/reset',
+    '/cadastro',
+    '/cadastro/salvar',
+];
 
 // Se não está logado e a rota não é pública → redireciona para login
 if (!isLoggedIn() && !in_array($uri, $rotasPublicas) && $uri !== '/') {
@@ -31,7 +40,7 @@ if ($uri === '/') {
 }
 
 // Se já está logado e tenta acessar login → redireciona para dashboard
-if (isLoggedIn() && in_array($uri, ['/login'])) {
+if (isLoggedIn() && in_array($uri, ['/login', '/cadastro', '/cadastro/salvar'])) {
     redirect('dashboard');
 }
 

@@ -12,6 +12,8 @@ return [
     '/auth/send-reset'              => ['AuthController', 'sendReset'],
     '/reset-password'               => ['AuthController', 'resetForm'],
     '/auth/reset'                   => ['AuthController', 'reset'],
+    '/cadastro'                     => ['RegisterController', 'form'],
+    '/cadastro/salvar'              => ['RegisterController', 'salvar'],
 
     // Dashboard
     '/dashboard'                    => ['DashboardController', 'index'],
@@ -22,6 +24,14 @@ return [
     '/agendamentos/salvar'          => ['AgendamentoController', 'salvar'],
     '/agendamentos/status/{id}'     => ['AgendamentoController', 'status'],
     '/agendamentos/excluir/{id}'    => ['AgendamentoController', 'excluir'],
+
+    // Portal do Cliente - Agendamentos
+    '/cliente/agendamentos'                     => ['ClienteAgendamentoController', 'index'],
+    '/cliente/agendamentos/novo'                => ['ClienteAgendamentoController', 'novo'],
+    '/cliente/agendamentos/salvar'              => ['ClienteAgendamentoController', 'salvar'],
+    '/cliente/agendamentos/{id}/editar'         => ['ClienteAgendamentoController', 'editar'],
+    '/cliente/agendamentos/{id}/atualizar'      => ['ClienteAgendamentoController', 'atualizar'],
+    '/cliente/agendamentos/{id}/cancelar'       => ['ClienteAgendamentoController', 'cancelar'],
 
     // Serviços
     '/servicos'                     => ['ServicoController', 'index'],
