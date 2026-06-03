@@ -26,6 +26,12 @@
                 <p class="text-muted mb-4">Faça login para gerenciar seu salão.</p>
                 
                 <form action="<?php echo base_url('auth/authenticate'); ?>" method="POST">
+                    <?php if (!empty($sucesso)): ?>
+                        <div class="alert alert-success py-2 small mb-3">
+                            <i class="bi bi-check-circle-fill me-1"></i>
+                            <?php echo htmlspecialchars($sucesso); ?>
+                        </div>
+                    <?php endif; ?>
                     <?php if (!empty($erro)): ?>
                         <div class="alert alert-danger py-2 small">
                             <i class="bi bi-exclamation-triangle-fill me-1"></i>
@@ -46,6 +52,8 @@
                     <button class="w-100 btn btn-lg btn-primary rounded-pill fw-medium" type="submit">Entrar no sistema</button>
                     <div class="mt-3">
                         <a href="<?php echo base_url('forgot-password'); ?>" class="small">Esqueci minha senha</a>
+                        <span class="text-muted mx-1">•</span>
+                        <a href="<?php echo base_url('cadastro'); ?>" class="small">Criar conta</a>
                     </div>
                     <p class="mt-4 mb-3 text-muted">&copy; 2026 — Glow Agenda</p>
                 </form>
