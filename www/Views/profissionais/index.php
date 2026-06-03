@@ -1,4 +1,13 @@
-<?php if (!empty($msg)) echo $msg; ?>
+<?php 
+if (!empty($msg)) {
+    echo $msg;
+    $detalhes = $_SESSION['form_profissional_erro'] ?? [];
+    unset($_SESSION['form_profissional_erro']);
+    $jsonMsg = json_encode($msg);
+    $jsonDetalhes = json_encode($detalhes);
+    echo '<script>console.log("%c[PROF-INDEX] Message displayed after redirect", "color: red; font-weight: bold;"); console.log("Message HTML:", ' . $jsonMsg . '); console.log("Validation details:", ' . $jsonDetalhes . ');</script>';
+}
+?>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <form class="d-flex" method="GET" action="<?php echo base_url('profissionais'); ?>">

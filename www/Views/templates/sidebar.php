@@ -7,10 +7,15 @@
                 <a href="<?php echo base_url('dashboard'); ?>" class="list-group-item list-group-item-action bg-transparent border-0 px-4 py-3 fw-medium <?php echo (strpos($_SERVER['REQUEST_URI'], 'dashboard') !== false) ? 'active text-primary' : 'text-secondary'; ?>">
                     <i class="bi bi-grid-fill me-2"></i> Dashboard
                 </a>
-                <a href="<?php echo base_url('agendamentos'); ?>" class="list-group-item list-group-item-action bg-transparent border-0 px-4 py-3 fw-medium <?php echo (strpos($_SERVER['REQUEST_URI'], 'agendamentos') !== false) ? 'active text-primary' : 'text-secondary'; ?>">
-                    <i class="bi bi-calendar-event-fill me-2"></i> Agendamentos
-                </a>
                 <?php $role = $_SESSION['usuario_perfil'] ?? ''; ?>
+                <?php
+                    $agLink   = $role === 'cliente' ? 'cliente/agendamentos' : 'agendamentos';
+                    $agActive = strpos($_SERVER['REQUEST_URI'], $agLink) !== false;
+                    $agLabel  = $role === 'cliente' ? 'Meus agendamentos' : 'Agendamentos';
+                ?>
+                <a href="<?php echo base_url($agLink); ?>" class="list-group-item list-group-item-action bg-transparent border-0 px-4 py-3 fw-medium <?php echo $agActive ? 'active text-primary' : 'text-secondary'; ?>">
+                    <i class="bi bi-calendar-event-fill me-2"></i> <?php echo $agLabel; ?>
+                </a>
                 <?php if ($role === 'admin' || $role === 'profissional'): ?>
                     <a href="<?php echo base_url('servicos'); ?>" class="list-group-item list-group-item-action bg-transparent border-0 px-4 py-3 fw-medium <?php echo (strpos($_SERVER['REQUEST_URI'], 'servicos') !== false) ? 'active text-primary' : 'text-secondary'; ?>">
                         <i class="bi bi-scissors me-2"></i> Serviços
