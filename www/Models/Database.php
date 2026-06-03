@@ -29,12 +29,16 @@ class Database{
   private ?string $table;
 
  # Instancia de conexão com o banco de dados
- private PDO $connection;
+ protected PDO $connection;
 
   # Define a tabela e instancia e conexão
-  public function __construct(?string $table = null){
+  public function __construct(?string $table = null, ?PDO $connection = null){
     $this->table = $table;
-    $this->setConnection();
+    if ($connection instanceof PDO) {
+      $this->connection = $connection;
+    } else {
+      $this->setConnection();
+    }
   }
 
   # Método responsável por criar uma conexão com o banco de dados
@@ -63,6 +67,42 @@ class Database{
       $statement->execute($params);
       return $statement;
     }catch(PDOException $e){
+      throw $e;
+    }
+  }
+
+  public function getConnection(): PDO
+  {
+    return $this->connection;
+  }
+
+  public function beginTransaction(): bool
+  {
+    return $this->connection->beginTransaction();
+  }
+
+  public function commit(): bool
+  {
+    return $this->connection->commit();
+  }
+
+  public function rollBack(): bool
+  {
+    if ($this->connection->inTransaction()) {
+      return $this->connection->rollBack();
+    }
+    return false;
+  }
+
+  public function transaction(callable $callback)
+  {
+    $this->beginTransaction();
+    try {
+      $result = $callback($this->connection);
+      $this->commit();
+      return $result;
+    } catch (\Throwable $e) {
+      $this->rollBack();
       throw $e;
     }
   }
