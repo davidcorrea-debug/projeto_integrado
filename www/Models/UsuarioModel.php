@@ -6,9 +6,9 @@ use Models\Database;
 
 class UsuarioModel extends Database
 {
-    public function __construct()
+    public function __construct(?\PDO $connection = null)
     {
-        parent::__construct('usuarios');
+        parent::__construct('usuarios', $connection);
     }
 
     /**
@@ -41,6 +41,33 @@ class UsuarioModel extends Database
              FROM usuarios ORDER BY usuario_nome ASC"
         );
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Verifica se existe algum usuário com o e-mail informado (qualquer status)
+     */
+    public function emailExiste(string $email): bool
+    {
+        $registro = $this->buscarPorEmailTodos($email);
+        $existe = $registro !== null;
+        error_log('[USERMODEL] emailExiste email=' . $email . ' exists=' . ($existe ? '1' : '0'));
+        return $existe;
+    }
+
+    /**
+     * Busca usuário por e-mail independente de status
+     */
+    public function buscarPorEmailTodos(string $email): ?array
+    {
+        error_log('[USERMODEL] buscarPorEmailTodos email=' . $email);
+        $stmt = $this->execute(
+            "SELECT usuario_id, usuario_nome, usuario_email, usuario_perfil, usuario_ativo
+             FROM usuarios WHERE usuario_email = ? LIMIT 1",
+            [$email]
+        );
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        error_log('[USERMODEL] buscarPorEmailTodos found=' . ($result ? '1' : '0') . ($result ? (' ativo=' . ($result['usuario_ativo'] ?? 'null') . ' id=' . ($result['usuario_id'] ?? 'null')) : ''));
+        return $result ?: null;
     }
 
     /**
