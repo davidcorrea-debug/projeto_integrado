@@ -24,6 +24,10 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
     `atualizado_em`  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- Garante que ambientes já existentes contemplem o perfil "profissional"
+ALTER TABLE `usuarios`
+    MODIFY `usuario_perfil` ENUM('admin','profissional','cliente') NOT NULL DEFAULT 'cliente';
+
 -- ============================================================
 -- Tabela: password_resets (tokens de recuperação de senha)
 -- ============================================================
@@ -125,3 +129,10 @@ INSERT INTO `servicos` (`servico_nome`, `servico_descricao`, `servico_preco`, `s
     ('Hidratação Profunda','Restauração de fios danificados.',          120.00,  90,  3),
     ('Manicure',           'Cuidados completos para as unhas das mãos.', 40.00,  45,  4),
     ('Pedicure',           'Cuidados completos para as unhas dos pés.',  50.00,  60,  5);
+
+-- ALTER TABLE clientes
+-- ADD COLUMN cliente_usuario_id INT UNSIGNED NULL AFTER cliente_obs,
+-- ADD CONSTRAINT fk_clientes_usuario
+-- FOREIGN KEY (cliente_usuario_id)
+-- REFERENCES usuarios(usuario_id)
+-- ON DELETE SET NULL;
