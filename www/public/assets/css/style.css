@@ -80,3 +80,95 @@ body {
     border-radius: 0.5rem;
     padding: 0.6rem 1rem;
 }
+
+/* Configurações da conta */
+.config-wrapper {
+    position: relative;
+    background: linear-gradient(135deg, rgba(var(--bs-primary-rgb), 0.12) 0%, rgba(52, 16, 53, 0.1) 100%);
+    border-radius: 2rem;
+    padding-inline: clamp(1rem, 4vw, 3rem);
+}
+
+.config-hero {
+    background: linear-gradient(135deg, rgba(var(--bs-primary-rgb), 0.85) 0%, rgba(122, 27, 87, 0.85) 100%);
+    border-radius: 1.5rem;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    color: #fff;
+}
+
+.config-title {
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+}
+
+.config-subtitle {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.95rem;
+}
+
+.config-card {
+    margin-top: -2.5rem;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    background: #fff;
+}
+
+.config-card .card-body {
+    position: relative;
+    z-index: 1;
+}
+
+.config-alert {
+    border-radius: 1rem;
+    border: none;
+}
+
+
+.config-section {
+    border-radius: 1.25rem;
+    background: linear-gradient(135deg, rgba(248, 249, 250, 0.9), rgba(255, 255, 255, 0.95));
+    border: 1px solid rgba(214, 51, 132, 0.05);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+
+
+.config-tip {
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 193, 7, 0.4);
+    background: rgba(255, 243, 205, 0.65);
+    color: #8b6b12;
+}
+
+.btn-gradient {
+    background: linear-gradient(135deg, var(--bs-primary) 0%, #b02a6c 100%);
+    border: none;
+    color: #fff;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.75rem 1.5rem rgba(var(--bs-primary-rgb), 0.25);
+    color: #fff;
+}
+
+.btn-gradient:focus-visible {
+    outline: 3px solid rgba(var(--bs-primary-rgb), 0.35);
+    outline-offset: 2px;
+}
+
+@media (max-width: 767.98px) {
+    .config-wrapper {
+        border-radius: 1.5rem;
+        padding-inline: 1rem;
+    }
+
+    .config-card {
+        margin-top: -2rem;
+        border-radius: 1.5rem;
+    }
+
+    .config-hero {
+        border-radius: 1.5rem;
+    }
+}
