@@ -29,6 +29,11 @@ $rotasPublicas = [
     '/cadastro/salvar',
 ];
 
+// Rotas autenticadas que devem responder sem layout (ex.: JSON)
+$rotasSemLayout = [
+    '/cliente/agendamentos/resumo',
+];
+
 // Se não está logado e a rota não é pública → redireciona para login
 if (!isLoggedIn() && !in_array($uri, $rotasPublicas) && $uri !== '/') {
     redirect('login');
@@ -66,6 +71,11 @@ if ($handler) {
 
     // Rotas públicas: renderiza sem layout de painel
     if (in_array($uri, $rotasPublicas)) {
+        $controller = new $name();
+        if (method_exists($controller, $method)) {
+            call_user_func_array([$controller, $method], $params);
+        }
+    } elseif (in_array($uri, $rotasSemLayout)) {
         $controller = new $name();
         if (method_exists($controller, $method)) {
             call_user_func_array([$controller, $method], $params);
