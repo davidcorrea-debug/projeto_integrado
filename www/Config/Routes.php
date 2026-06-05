@@ -49,6 +49,10 @@ return [
     '/clientes/atualizar/{id}'      => ['ClienteController', 'atualizar'],
     '/clientes/excluir/{id}'        => ['ClienteController', 'excluir'],
 
+    // Configurações de conta
+    '/configuracoes'                => ['ConfiguracaoController', 'editar'],
+    '/configuracoes/salvar'         => ['ConfiguracaoController', 'atualizar'],
+
     // Profissionais
     '/profissionais'                => ['ProfissionalController', 'index'],
     '/profissionais/novo'           => ['ProfissionalController', 'novo'],
