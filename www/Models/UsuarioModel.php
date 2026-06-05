@@ -98,6 +98,20 @@ class UsuarioModel extends Database
     }
 
     /**
+     * Busca usuário por ID incluindo hash da senha
+     */
+    public function buscarComSenhaPorId(int $id): ?array
+    {
+        $stmt = $this->execute(
+            "SELECT usuario_id, usuario_nome, usuario_email, usuario_perfil, usuario_ativo, usuario_senha
+             FROM usuarios WHERE usuario_id = ? LIMIT 1",
+            [$id]
+        );
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $result ?: null;
+    }
+
+    /**
      * Salva novo usuário
      */
     public function salvar(array $dados): int
