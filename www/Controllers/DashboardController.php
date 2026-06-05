@@ -12,9 +12,41 @@ class DashboardController
 {
     public function index(): void
     {
+        $perfil    = $_SESSION['usuario_perfil'] ?? '';
+        $usuarioId = (int)($_SESSION['usuario_id'] ?? 0);
+        $email     = $_SESSION['usuario_email'] ?? null;
+
         $agendamentoModel = new AgendamentoModel();
         $clienteModel     = new ClienteModel();
-        $servicoModel     = new ServicoModel();
+
+        if ($perfil === 'cliente') {
+            if (!$usuarioId) {
+                redirect('login');
+            }
+
+            $cliente = $clienteModel->buscarPorUsuarioId($usuarioId, $email);
+            if (!$cliente) {
+                $_SESSION['msg'] = msg('Não encontramos um cadastro de cliente vinculado à sua conta.', 'danger');
+                redirect('configuracoes');
+            }
+
+            $proximos = $agendamentoModel->listarProximosPorCliente((int)$cliente['cliente_id']);
+            $historico = $agendamentoModel->listarHistoricoPorCliente((int)$cliente['cliente_id']);
+
+            $data = [
+                'pagina'          => 'Resumo da Conta',
+                'cliente'         => $cliente,
+                'proximos'        => array_slice($proximos, 0, 4),
+                'proximoPrincipal'=> $proximos[0] ?? null,
+                'totalProximos'   => is_countable($proximos) ? count($proximos) : 0,
+                'historico'       => array_slice($historico, 0, 5),
+            ];
+
+            view('dashboard/cliente', $data);
+            return;
+        }
+
+        $servicoModel = new ServicoModel();
 
         $data = [
             'pagina'             => 'Dashboard',
