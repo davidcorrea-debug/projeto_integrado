@@ -83,6 +83,86 @@ class ClienteAgendamentoController
         ]);
     }
 
+    public function resumo(): void
+    {
+        if (!isLoggedIn()) {
+            http_response_code(401);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['error' => 'unauthenticated'], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        requireRole(['cliente']);
+
+        $usuarioId = (int)($_SESSION['usuario_id'] ?? 0);
+        $email     = $_SESSION['usuario_email'] ?? null;
+
+        if (!$usuarioId || !$email) {
+            http_response_code(400);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['error' => 'cliente_nao_encontrado'], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        $cliente = $this->clienteModel->buscarPorUsuarioId($usuarioId, $email);
+        if (!$cliente) {
+            http_response_code(404);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['error' => 'cliente_nao_encontrado'], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        $proximos  = $this->agendamentoModel->listarProximosPorCliente((int)$cliente['cliente_id']);
+        $historico = $this->agendamentoModel->listarHistoricoPorCliente((int)$cliente['cliente_id']);
+
+        $mapBadge = [
+            'aguardando'   => 'bg-warning text-dark',
+            'confirmado'   => 'bg-success',
+            'em_andamento' => 'bg-info text-dark',
+            'concluido'    => 'bg-primary',
+            'cancelado'    => 'bg-danger',
+        ];
+
+        $mapLabel = [
+            'aguardando'   => 'Aguardando',
+            'confirmado'   => 'Confirmado',
+            'em_andamento' => 'Em andamento',
+            'concluido'    => 'Concluído',
+            'cancelado'    => 'Cancelado',
+        ];
+
+        $proximosFormatados = array_map(function ($ag) use ($mapBadge, $mapLabel) {
+            $status = $ag['agendamento_status'] ?? 'aguardando';
+            $hora   = substr($ag['agendamento_hora'] ?? '', 0, 5);
+
+            return [
+                'id'          => (int)($ag['agendamento_id'] ?? 0),
+                'data'        => formatarData($ag['agendamento_data']),
+                'hora'        => $hora,
+                'servico'     => $ag['servico_nome'] ?? '',
+                'profissional'=> $ag['profissional_nome'] ?? '',
+                'status'      => $status,
+                'statusLabel' => $mapLabel[$status] ?? ucfirst($status),
+                'statusBadge' => $mapBadge[$status] ?? 'bg-secondary',
+            ];
+        }, $proximos);
+
+        $primeiroProximo = $proximosFormatados[0] ?? null;
+        $proximoResumo   = $primeiroProximo
+            ? $primeiroProximo['data'] . ' às ' . $primeiroProximo['hora']
+            : 'Nenhum compromisso futuro';
+
+        $payload = [
+            'totalProximos'   => count($proximosFormatados),
+            'totalHistorico'  => is_countable($historico) ? count($historico) : 0,
+            'proximoResumo'   => $proximoResumo,
+            'proximos'        => array_slice($proximosFormatados, 0, 6),
+        ];
+
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($payload, JSON_UNESCAPED_UNICODE);
+    }
+
     public function novo(): void
     {
         $cliente = $this->clienteLogado();
