@@ -7,10 +7,10 @@
 ?>
 
 <section class="client-dashboard py-4 py-lg-5">
-    <div class="row g-4 mb-4 align-items-stretch">
-        <div class="col-12 col-lg-7 d-flex flex-column gap-4">
+    <div class="row g-4 mb-4 justify-content-end">
+        <div class="col-12 col-lg-10 col-xl-8 col-xxl-7 d-flex flex-column gap-4">
             <div class="client-card client-dashboard__intro">
-                <div class="client-dashboard__greeting">
+                <div class="client-dashboard__greeting text-lg-end">
                     <span class="badge rounded-pill text-bg-light text-uppercase fw-semibold small mb-2">Bem-vindo(a)</span>
                     <h2 class="fw-semibold mb-1">Olá, <?php echo $clienteNome; ?>!</h2>
                     <p class="text-muted mb-0">Aqui está um resumo rápido da sua agenda e atalhos para facilitar o próximo atendimento.</p>
@@ -26,13 +26,13 @@
             </div>
 
             <div class="client-card flex-grow-1">
-                <div class="client-card__header d-flex justify-content-between align-items-center mb-3">
-                    <div>
+                <div class="client-card__header d-flex align-items-start align-items-lg-center gap-3 mb-3">
+                    <div class="text-lg-end">
                         <h5 class="fw-semibold mb-1">Próximo atendimento</h5>
                         <span class="text-muted small">Resumo do compromisso mais recente agendado</span>
                     </div>
                     <?php if ($proximaSessao): ?>
-                        <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2">
+                        <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 ms-lg-auto">
                             <?php echo formatarData($proximaSessao['agendamento_data']); ?> às <?php echo substr($proximaSessao['agendamento_hora'] ?? '', 0, 5); ?>
                         </span>
                     <?php endif; ?>
@@ -72,48 +72,6 @@
                         </a>
                     </div>
                 <?php endif; ?>
-            </div>
-        </div>
-        <div class="col-12 col-lg-5">
-            <div class="client-card h-100">
-                <div class="client-card__header d-flex justify-content-between align-items-center mb-3">
-                    <div>
-                        <h5 class="fw-semibold mb-1">Atalhos rápidos</h5>
-                        <span class="text-muted small">Gerencie seus dados com facilidade</span>
-                    </div>
-                </div>
-                <div class="client-shortcuts">
-                    <a href="<?php echo base_url('configuracoes'); ?>" class="client-shortcut">
-                        <div class="client-shortcut__icon bg-primary bg-opacity-10 text-primary">
-                            <i class="bi bi-person-gear"></i>
-                        </div>
-                        <div>
-                            <h6 class="mb-1 fw-semibold">Atualizar meus dados</h6>
-                            <span class="text-muted small">Nome, e-mail, telefone ou senha</span>
-                        </div>
-                        <i class="bi bi-chevron-right text-muted"></i>
-                    </a>
-                    <a href="<?php echo base_url('cliente/agendamentos'); ?>" class="client-shortcut">
-                        <div class="client-shortcut__icon bg-success bg-opacity-10 text-success">
-                            <i class="bi bi-calendar-week"></i>
-                        </div>
-                        <div>
-                            <h6 class="mb-1 fw-semibold">Ver minha agenda completa</h6>
-                            <span class="text-muted small">Consultar próximos horários e histórico</span>
-                        </div>
-                        <i class="bi bi-chevron-right text-muted"></i>
-                    </a>
-                    <a href="<?php echo base_url('cliente/agendamentos/novo'); ?>" class="client-shortcut">
-                        <div class="client-shortcut__icon bg-warning bg-opacity-10 text-warning">
-                            <i class="bi bi-stars"></i>
-                        </div>
-                        <div>
-                            <h6 class="mb-1 fw-semibold">Marcar novo serviço</h6>
-                            <span class="text-muted small">Escolha o melhor horário para você</span>
-                        </div>
-                        <i class="bi bi-chevron-right text-muted"></i>
-                    </a>
-                </div>
             </div>
         </div>
     </div>
