@@ -32,7 +32,8 @@
                 
                 <hr class="mx-3 text-secondary">
                 
-                <a href="#" class="list-group-item list-group-item-action bg-transparent border-0 px-4 py-3 fw-medium text-secondary">
+                <?php $configActive = strpos($_SERVER['REQUEST_URI'], 'configuracoes') !== false; ?>
+                <a href="<?php echo base_url('configuracoes'); ?>" class="list-group-item list-group-item-action bg-transparent border-0 px-4 py-3 fw-medium <?php echo $configActive ? 'active text-primary' : 'text-secondary'; ?>">
                     <i class="bi bi-gear-fill me-2"></i> Configurações
                 </a>
                 <a href="<?php echo base_url('logout'); ?>" class="list-group-item list-group-item-action bg-transparent border-0 px-4 py-3 fw-medium text-danger mt-5">
@@ -59,7 +60,7 @@
                             <small class="text-muted ms-1">(<?php echo htmlspecialchars($_SESSION['usuario_perfil'] ?? ''); ?>)</small>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i> Meu Perfil</a></li>
+                            <li><a class="dropdown-item" href="<?php echo base_url('configuracoes'); ?>"><i class="bi bi-person me-2"></i> Meu Perfil</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-danger" href="<?php echo base_url('logout'); ?>"><i class="bi bi-box-arrow-right me-2"></i> Sair</a></li>
                         </ul>

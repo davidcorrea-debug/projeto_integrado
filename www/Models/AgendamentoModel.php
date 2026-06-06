@@ -113,6 +113,7 @@ class AgendamentoModel extends Database
              INNER JOIN usuarios u ON a.usuario_id = u.usuario_id
              WHERE a.cliente_id = ?
                AND TIMESTAMP(a.agendamento_data, a.agendamento_hora) >= NOW()
+               AND a.agendamento_status <> 'cancelado'
              ORDER BY a.agendamento_data ASC, a.agendamento_hora ASC",
             [$clienteId]
         );

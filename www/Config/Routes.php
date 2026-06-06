@@ -27,6 +27,7 @@ return [
 
     // Portal do Cliente - Agendamentos
     '/cliente/agendamentos'                     => ['ClienteAgendamentoController', 'index'],
+    '/cliente/agendamentos/resumo'              => ['ClienteAgendamentoController', 'resumo'],
     '/cliente/agendamentos/novo'                => ['ClienteAgendamentoController', 'novo'],
     '/cliente/agendamentos/salvar'              => ['ClienteAgendamentoController', 'salvar'],
     '/cliente/agendamentos/{id}/editar'         => ['ClienteAgendamentoController', 'editar'],
@@ -48,6 +49,10 @@ return [
     '/clientes/editar/{id}'         => ['ClienteController', 'editar'],
     '/clientes/atualizar/{id}'      => ['ClienteController', 'atualizar'],
     '/clientes/excluir/{id}'        => ['ClienteController', 'excluir'],
+
+    // Configurações de conta
+    '/configuracoes'                => ['ConfiguracaoController', 'editar'],
+    '/configuracoes/salvar'         => ['ConfiguracaoController', 'atualizar'],
 
     // Profissionais
     '/profissionais'                => ['ProfissionalController', 'index'],
