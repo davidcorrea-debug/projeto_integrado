@@ -98,37 +98,50 @@ CREATE TABLE IF NOT EXISTS `agendamentos` (
     FOREIGN KEY (`usuario_id`)  REFERENCES `usuarios`(`usuario_id`)  ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE estabelecimento (
+    id TINYINT PRIMARY KEY DEFAULT 1,
+    nome           VARCHAR(120),
+    nome_fantasia  VARCHAR(120),
+    cnpj           VARCHAR(18),
+    telefone       VARCHAR(20),
+    email          VARCHAR(120),
+    endereco       TEXT,
+    instagram      VARCHAR(120),
+    facebook       VARCHAR(120),
+    site           VARCHAR(120),
+    updated_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
 -- ============================================================
 -- Dados iniciais: Categorias
 -- ============================================================
-INSERT INTO `categorias` (`categoria_nome`) VALUES
-    ('Cabelo'),
-    ('Coloração'),
-    ('Tratamento'),
-    ('Manicure'),
-    ('Pedicure'),
-    ('Estética');
+-- INSERT INTO `categorias` (`categoria_nome`) VALUES
+--     ('Cabelo'),
+--     ('Coloração'),
+--     ('Tratamento'),
+--     ('Manicure'),
+--     ('Pedicure'),
+--     ('Estética');
 
 -- ============================================================
 -- Dados iniciais: Usuário Admin (senha: admin123)
 -- ============================================================
-INSERT INTO `usuarios` (`usuario_nome`, `usuario_email`, `usuario_senha`, `usuario_perfil`)
-VALUES ('Administrador', 'admin@glowagenda.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin')
-ON DUPLICATE KEY UPDATE
-  `usuario_nome` = VALUES(`usuario_nome`),
-  `usuario_perfil` = VALUES(`usuario_perfil`);
+-- INSERT INTO `usuarios` (`usuario_nome`, `usuario_email`, `usuario_senha`, `usuario_perfil`)
+-- VALUES ('Administrador', 'admin@glowagenda.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin')
+-- ON DUPLICATE KEY UPDATE
+--   `usuario_nome` = VALUES(`usuario_nome`),
+--   `usuario_perfil` = VALUES(`usuario_perfil`);
 
 -- ============================================================
 -- Dados iniciais: Serviços de exemplo
 -- ============================================================
-INSERT INTO `servicos` (`servico_nome`, `servico_descricao`, `servico_preco`, `servico_duracao`, `categoria_id`) VALUES
-    ('Corte Feminino',     'Corte moderno com finalização simples.',     80.00,  60,  1),
-    ('Corte Masculino',    'Corte e acabamento masculino.',              50.00,  30,  1),
-    ('Mechas Balayage',    'Iluminação suave para visual natural.',     250.00, 180,  2),
-    ('Coloração Raiz',     'Retoque de raiz com tinta profissional.',   120.00,  90,  2),
-    ('Hidratação Profunda','Restauração de fios danificados.',          120.00,  90,  3),
-    ('Manicure',           'Cuidados completos para as unhas das mãos.', 40.00,  45,  4),
-    ('Pedicure',           'Cuidados completos para as unhas dos pés.',  50.00,  60,  5);
+-- INSERT INTO `servicos` (`servico_nome`, `servico_descricao`, `servico_preco`, `servico_duracao`, `categoria_id`) VALUES
+--     ('Corte Feminino',     'Corte moderno com finalização simples.',     80.00,  60,  1),
+--     ('Corte Masculino',    'Corte e acabamento masculino.',              50.00,  30,  1),
+--     ('Mechas Balayage',    'Iluminação suave para visual natural.',     250.00, 180,  2),
+--     ('Coloração Raiz',     'Retoque de raiz com tinta profissional.',   120.00,  90,  2),
+--     ('Hidratação Profunda','Restauração de fios danificados.',          120.00,  90,  3),
+--     ('Manicure',           'Cuidados completos para as unhas das mãos.', 40.00,  45,  4),
+--     ('Pedicure',           'Cuidados completos para as unhas dos pés.',  50.00,  60,  5);
 
 -- ALTER TABLE clientes
 -- ADD COLUMN cliente_usuario_id INT UNSIGNED NULL AFTER cliente_obs,
