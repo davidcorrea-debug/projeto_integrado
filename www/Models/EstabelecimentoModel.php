@@ -24,6 +24,19 @@ class EstabelecimentoModel extends Database
         return $dados ?: null;
     }
 
+    public function obterSemCache(): ?array
+    {
+        $stmt = $this->execute(
+            "SELECT id, nome, nome_fantasia, cnpj, telefone, email, endereco, cep, localizacao_url, instagram, facebook, site
+             FROM estabelecimento
+             ORDER BY id ASC
+             LIMIT 1"
+        );
+
+        $dados = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $dados ?: null;
+    }
+
     public function salvar(array $dados): bool
     {
         $payload = $this->filtrarCampos($dados);

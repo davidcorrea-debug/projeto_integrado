@@ -27,7 +27,7 @@ class EstabelecimentoController
 
     public function editar(): void
     {
-        requireRole(['admin']);
+        requireRole(['admin', 'profissional']);
 
         $dados = $this->model->obter();
 
@@ -44,7 +44,7 @@ class EstabelecimentoController
 
     public function salvar(): void
     {
-        requireRole(['admin']);
+        requireRole(['admin', 'profissional']);
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             redirect('configuracoes');

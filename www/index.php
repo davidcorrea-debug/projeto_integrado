@@ -10,6 +10,18 @@ include_once 'Config/Helpers.php';
 include_once 'Config/Security.php';
 include_once 'Autoloader.php';
 
+$estabelecimentoInfo = [];
+$exibirEstabelecimentoFooter = false;
+$papelAtual = currentUserRole();
+if ($papelAtual === 'cliente') {
+    try {
+        $estabelecimentoInfo = (new \Models\EstabelecimentoModel())->obter() ?? [];
+    } catch (\Throwable $e) {
+        error_log('[APP] erro ao carregar dados do estabelecimento: ' . $e->getMessage());
+    }
+    $exibirEstabelecimentoFooter = true;
+}
+
 // Carrega as rotas
 $routes = require __DIR__ . '/Config/Routes.php';
 
