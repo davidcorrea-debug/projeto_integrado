@@ -4,16 +4,20 @@ namespace Controllers;
 
 require_once("Models/Database.php");
 require_once("Config/Helpers.php");
+require_once("Models/EstabelecimentoModel.php");
 use Models\UsuarioModel;
 use Models\PasswordResetModel;
+use Models\EstabelecimentoModel;
 
 class AuthController
 {
     private UsuarioModel $model;
+    private EstabelecimentoModel $estabelecimentoModel;
 
     public function __construct()
     {
         $this->model = new UsuarioModel();
+        $this->estabelecimentoModel = new EstabelecimentoModel();
     }
 
     /**
@@ -23,6 +27,7 @@ class AuthController
     {
         $erro    = $_SESSION['login_erro'] ?? '';
         $sucesso = $_SESSION['login_sucesso'] ?? '';
+        $estabelecimento = $this->estabelecimentoModel->obter();
         unset($_SESSION['login_erro'], $_SESSION['login_sucesso']);
         include("Views/auth/login.php");
     }

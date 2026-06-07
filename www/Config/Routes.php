@@ -54,6 +54,10 @@ return [
     '/configuracoes'                => ['ConfiguracaoController', 'editar'],
     '/configuracoes/salvar'         => ['ConfiguracaoController', 'atualizar'],
 
+    // Estabelecimento (Admin)
+    '/estabelecimento'              => ['EstabelecimentoController', 'editar'],
+    '/estabelecimento/salvar'       => ['EstabelecimentoController', 'salvar'],
+
     // Profissionais
     '/profissionais'                => ['ProfissionalController', 'index'],
     '/profissionais/novo'           => ['ProfissionalController', 'novo'],
