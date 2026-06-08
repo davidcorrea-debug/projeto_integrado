@@ -1,10 +1,12 @@
+<?php $ehProfissional = !empty($painel_profissional); ?>
+
 <!-- Dashboard: Cards de estatísticas -->
 <div class="row g-4 mb-4">
     <div class="col-12 col-sm-6 col-xl-3">
         <div class="card shadow-sm h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="text-muted mb-0">Agendamentos Hoje</h6>
+                    <h6 class="text-muted mb-0"><?php echo $ehProfissional ? 'Meus agendamentos hoje' : 'Agendamentos Hoje'; ?></h6>
                     <div class="bg-primary bg-opacity-10 text-primary rounded px-2 py-1">
                         <i class="bi bi-calendar-check"></i>
                     </div>
@@ -18,7 +20,7 @@
         <div class="card shadow-sm h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="text-muted mb-0">Receita do Dia</h6>
+                    <h6 class="text-muted mb-0"><?php echo $ehProfissional ? 'Minha receita do dia' : 'Receita do Dia'; ?></h6>
                     <div class="bg-success bg-opacity-10 text-success rounded px-2 py-1">
                         <i class="bi bi-currency-dollar"></i>
                     </div>
@@ -32,7 +34,7 @@
         <div class="card shadow-sm h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="text-muted mb-0">Clientes Cadastrados</h6>
+                    <h6 class="text-muted mb-0"><?php echo $ehProfissional ? 'Clientes atendidos' : 'Clientes Cadastrados'; ?></h6>
                     <div class="bg-info bg-opacity-10 text-info rounded px-2 py-1">
                         <i class="bi bi-people"></i>
                     </div>
@@ -46,7 +48,7 @@
         <div class="card shadow-sm h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h6 class="text-muted mb-0">Receita do Mês</h6>
+                    <h6 class="text-muted mb-0"><?php echo $ehProfissional ? 'Minha receita do mês' : 'Receita do Mês'; ?></h6>
                     <div class="bg-warning bg-opacity-10 text-warning rounded px-2 py-1">
                         <i class="bi bi-graph-up"></i>
                     </div>
@@ -61,7 +63,7 @@
 <!-- Próximos atendimentos -->
 <div class="card shadow-sm border-0">
     <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-        <h5 class="mb-0 fw-semibold">Agendamentos de Hoje</h5>
+        <h5 class="mb-0 fw-semibold"><?php echo $ehProfissional ? 'Meus agendamentos de hoje' : 'Agendamentos de Hoje'; ?></h5>
         <a href="<?php echo base_url('agendamentos'); ?>" class="btn btn-sm btn-outline-primary rounded-pill">Ver todos</a>
     </div>
     <div class="card-body p-0">

@@ -46,6 +46,26 @@ class DashboardController
             return;
         }
 
+        if ($perfil === 'profissional') {
+            if (!$usuarioId) {
+                redirect('login');
+            }
+
+            $data = [
+                'pagina'             => 'Meu Painel',
+                'agendamentos_hoje'  => $agendamentoModel->totalHojePorProfissional($usuarioId),
+                'receita_hoje'       => $agendamentoModel->receitaHojePorProfissional($usuarioId),
+                'receita_mes'        => $agendamentoModel->receitaMesPorProfissional($usuarioId),
+                'total_clientes'     => $agendamentoModel->totalClientesPorProfissional($usuarioId),
+                'total_servicos'     => $agendamentoModel->totalServicosPorProfissional($usuarioId),
+                'proximos'           => $agendamentoModel->listarPorDataProfissional(date('Y-m-d'), $usuarioId),
+                'painel_profissional'=> true,
+            ];
+
+            view('dashboard/index', $data);
+            return;
+        }
+
         $servicoModel = new ServicoModel();
 
         $data = [
@@ -56,6 +76,7 @@ class DashboardController
             'total_clientes'     => $clienteModel->total(),
             'total_servicos'     => $servicoModel->totalAtivos(),
             'proximos'           => $agendamentoModel->listarPorData(date('Y-m-d')),
+            'painel_profissional'=> false,
         ];
 
         view('dashboard/index', $data);
