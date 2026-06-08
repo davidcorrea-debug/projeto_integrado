@@ -186,6 +186,31 @@ class AgendamentoModel extends Database
     }
 
     /**
+     * Verifica se já existe agendamento no mesmo horário para o profissional
+     */
+    public function existeConflitoHorario(int $usuarioId, string $data, string $hora, ?int $ignorarId = null): bool
+    {
+        $sql = "SELECT COUNT(*) AS total
+                FROM agendamentos
+                WHERE usuario_id = ?
+                  AND agendamento_data = ?
+                  AND agendamento_hora = ?
+                  AND agendamento_status <> 'cancelado'";
+
+        $params = [$usuarioId, $data, $hora];
+
+        if (!empty($ignorarId)) {
+            $sql    .= " AND agendamento_id <> ?";
+            $params[] = $ignorarId;
+        }
+
+        $stmt = $this->execute($sql, $params);
+        $resultado = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        return ((int)($resultado['total'] ?? 0)) > 0;
+    }
+
+    /**
      * Salva novo agendamento
      */
     public function salvar(array $dados): int

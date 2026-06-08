@@ -132,6 +132,11 @@ class AgendamentoController
             redirect('agendamentos/novo');
         }
 
+        if ($this->model->existeConflitoHorario($dados['usuario_id'], $dados['agendamento_data'], $dados['agendamento_hora'])) {
+            $_SESSION['msg'] = msg('Esse profissional já possui um agendamento neste horário.', 'danger');
+            redirect('agendamentos/novo');
+        }
+
         $this->model->salvar($dados);
         $_SESSION['msg'] = msg('Agendamento criado com sucesso!', 'success');
         redirect('agendamentos?data=' . $dados['agendamento_data']);
