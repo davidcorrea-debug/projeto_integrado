@@ -2,11 +2,10 @@
         <div id="sidebar-wrapper" class="sidebar-wrapper">
             <div class="sidebar-brand">
                 <div class="sidebar-brand__icon">
-                    <i class="bi bi-moon-stars-fill"></i>
+                    <i class="bi bi-scissors"></i>
                 </div>
                 <div class="sidebar-brand__text">
                     <span class="sidebar-brand__title">Glow Agenda</span>
-                    <span class="sidebar-brand__subtitle">Experiência premium</span>
                 </div>
             </div>
 
@@ -74,11 +73,11 @@
 
             <div class="sidebar-help">
                 <div class="sidebar-help__icon">
-                    <i class="bi bi-headset"></i>
+                    <i class="bi bi-whatsapp"></i>
                 </div>
                 <div class="sidebar-help__text">
-                    <span class="sidebar-help__label">Precisa de ajuda?</span>
-                    <a href="mailto:contato@glowagenda.com" class="sidebar-help__link">Fale com o suporte</a>
+                    <span class="sidebar-help__label">Atendimento rápido</span>
+                    <a href="https://wa.me/5562999878711" target="_blank" rel="noopener noreferrer" class="sidebar-help__link">Falar no WhatsApp</a>
                 </div>
             </div>
         </div>

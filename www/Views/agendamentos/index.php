@@ -1,6 +1,7 @@
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <p class="text-muted mb-0">Controle a agenda e visualize os compromissos</p>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div class="agenda-hero">
+        <p class="agenda-hero__title mb-2">Controle a agenda e visualize os compromissos</p>
+        <div class="agenda-hero__bar"></div>
     </div>
     <a href="<?php echo base_url('agendamentos/novo'); ?>" class="btn btn-primary rounded-pill px-4 shadow-sm">
         <i class="bi bi-calendar-plus me-1"></i> Novo Agendamento
@@ -10,24 +11,24 @@
 <!-- Navegação do Calendário e Filtros -->
 <div class="row mb-4 align-items-center">
     <div class="col-md-4">
-        <div class="btn-group shadow-sm" role="group">
-            <a href="<?php echo base_url('agendamentos?data=' . $dataAnterior); ?>" class="btn btn-outline-secondary"><i class="bi bi-chevron-left"></i></a>
-            <button type="button" class="btn btn-outline-secondary fw-semibold px-4"><?php echo formatarData($data); ?></button>
-            <a href="<?php echo base_url('agendamentos?data=' . $dataProxima); ?>" class="btn btn-outline-secondary"><i class="bi bi-chevron-right"></i></a>
+        <div class="btn-group shadow-sm agenda-date-group" role="group">
+            <a href="<?php echo base_url('agendamentos?data=' . $dataAnterior); ?>" class="btn agenda-date-btn"><i class="bi bi-chevron-left"></i></a>
+            <span class="btn agenda-date-display fw-semibold px-4"><?php echo formatarData($data); ?></span>
+            <a href="<?php echo base_url('agendamentos?data=' . $dataProxima); ?>" class="btn agenda-date-btn"><i class="bi bi-chevron-right"></i></a>
         </div>
     </div>
     <div class="col-md-8 d-flex justify-content-md-end mt-3 mt-md-0">
-        <div class="btn-group me-3 shadow-sm" role="group">
+        <div class="btn-group me-3 shadow-sm agenda-toggle-group" role="group">
             <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
-            <label class="btn btn-outline-secondary" for="btnradio1">Lista</label>
+            <label class="btn agenda-toggle" for="btnradio1">Lista</label>
 
             <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
-            <label class="btn btn-outline-secondary" for="btnradio2">Dia</label>
+            <label class="btn agenda-toggle" for="btnradio2">Dia</label>
 
             <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
-            <label class="btn btn-outline-secondary" for="btnradio3">Semana</label>
+            <label class="btn agenda-toggle" for="btnradio3">Semana</label>
         </div>
-        <select class="form-select bg-light w-auto shadow-sm">
+        <select class="form-select agenda-select w-auto shadow-sm">
             <option selected>Todos os Profissionais</option>
         </select>
     </div>

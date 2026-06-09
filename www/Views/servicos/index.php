@@ -1,7 +1,10 @@
 <?php if (!empty($msg)) echo $msg; ?>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <p class="text-muted mb-0">Gerencie os serviços oferecidos pelo salão</p>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div class="agenda-hero">
+        <p class="agenda-hero__title mb-2">Gerencie os serviços oferecidos pelo salão</p>
+        <div class="agenda-hero__bar"></div>
+    </div>
     <a href="<?php echo base_url('servicos/novo'); ?>" class="btn btn-primary rounded-pill px-4 shadow-sm">
         <i class="bi bi-plus-lg me-1"></i> Novo Serviço
     </a>

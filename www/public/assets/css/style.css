@@ -68,6 +68,78 @@ body {
     background: rgba(var(--bs-primary-rgb), 0.05);
 }
 
+.agenda-hero {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(255, 213, 242, 0.85));
+    border-radius: 1.2rem;
+    padding: 1.1rem 1.4rem;
+    border: 1px solid rgba(var(--bs-primary-rgb), 0.18);
+    box-shadow: 0 1rem 2rem rgba(18, 8, 55, 0.12);
+}
+
+.agenda-hero__title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: rgba(33, 37, 41, 0.88);
+}
+
+.agenda-hero__bar {
+    width: 140px;
+    height: 4px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--color-pink-500), var(--color-accent-500));
+}
+
+.agenda-date-group .btn {
+    border: none;
+}
+
+.agenda-date-btn {
+    background: rgba(255, 255, 255, 0.7);
+    color: rgba(33, 37, 41, 0.7);
+    padding-inline: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.agenda-date-btn:hover {
+    color: var(--color-pink-500);
+}
+
+.agenda-date-display {
+    background: linear-gradient(135deg, rgba(255, 95, 197, 0.22), rgba(193, 88, 255, 0.22));
+    color: rgba(33, 37, 41, 0.88);
+    border-radius: 0.75rem;
+    pointer-events: none;
+}
+
+.agenda-toggle-group .btn {
+    border: none;
+}
+
+.agenda-toggle {
+    background: rgba(255, 255, 255, 0.65);
+    color: rgba(33, 37, 41, 0.65);
+    padding-inline: 1.1rem;
+    transition: all 0.2s ease;
+    border-radius: 0.8rem !important;
+}
+
+.agenda-toggle:hover,
+.agenda-toggle:focus,
+.agenda-toggle.active,
+.agenda-toggle-group .btn-check:checked + .agenda-toggle {
+    background: linear-gradient(135deg, rgba(255, 95, 197, 0.32), rgba(193, 88, 255, 0.28));
+    color: rgba(33, 37, 41, 0.9);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+
+.agenda-select {
+    background: rgba(255, 255, 255, 0.85);
+    color: rgba(33, 37, 41, 0.78);
+    border: none;
+    border-radius: 0.9rem;
+    padding: 0.65rem 1.25rem;
+}
+
 @media (min-width: 992px) {
     .client-dashboard__intro {
         flex-direction: row;
@@ -471,11 +543,11 @@ body {
 }
 
 .glow-topbar__title {
-    color: rgba(33, 37, 41, 0.85);
+    color: rgba(33, 37, 41, 0.9);
 }
 
 .glow-topbar__user {
-    color: rgba(33, 37, 41, 0.75);
+    color: rgba(33, 37, 41, 0.82);
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -484,6 +556,20 @@ body {
 
 .glow-topbar__user:hover {
     color: var(--color-accent-500);
+}
+
+.glow-topbar__user small {
+    color: rgba(33, 37, 41, 0.65);
+}
+
+.salon-card .form-label {
+    color: rgba(33, 37, 41, 0.8);
+    font-weight: 600;
+}
+
+.salon-card .text-muted,
+.salon-aside .text-muted {
+    color: rgba(33, 37, 41, 0.62) !important;
 }
 
 .glow-dropdown {
@@ -696,6 +782,14 @@ body {
     margin-bottom: 1rem;
 }
 
+.salon-card__subtitle {
+    margin-top: -0.25rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.9rem;
+    color: rgba(33, 37, 41, 0.68);
+    line-height: 1.5;
+}
+
 .salon-input .input-group-text {
     border: none;
     border-radius: 0.9rem 0.9rem 0.9rem 0.3rem;
@@ -711,7 +805,7 @@ body {
     background: rgba(255, 255, 255, 0.9);
     box-shadow: inset 0 0 0 1px rgba(214, 51, 132, 0.12);
     padding: 0.75rem 1rem;
-    color: rgba(33, 37, 41, 0.85);
+    color: rgba(33, 37, 41, 0.88);
 }
 
 .salon-input textarea.form-control {
@@ -739,7 +833,7 @@ body {
 
 .salon-aside__hint {
     margin-bottom: 1.5rem;
-    color: rgba(33, 37, 41, 0.6);
+    color: rgba(33, 37, 41, 0.68);
 }
 
 .salon-logo-card {

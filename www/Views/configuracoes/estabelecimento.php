@@ -38,6 +38,7 @@
             <div class="col-12 col-lg-8">
                 <section class="salon-card">
                     <h2 class="salon-card__title">Dados principais</h2>
+                    <p class="salon-card__subtitle">Informe o nome social, nome fantasia, CNPJ e telefone que identificam oficialmente o seu salão.</p>
                     <div class="row g-3">
                         <div class="col-12 col-md-6">
                             <label class="form-label">Nome do salão *</label>
@@ -72,6 +73,7 @@
 
                 <section class="salon-card">
                     <h2 class="salon-card__title">Contato e endereço</h2>
+                    <p class="salon-card__subtitle">Atualize endereço completo, canais de contato e redes sociais para que clientes encontrem o salão com facilidade.</p>
                     <div class="row g-3">
                         <div class="col-12">
                             <label class="form-label">Endereço completo *</label>
