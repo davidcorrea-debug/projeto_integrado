@@ -17,6 +17,6 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" type="text/css" href="<?php echo base_url('public/assets/css/style.css'); ?>">
 </head>
-<body class="bg-light">
+<body class="app-body">
     <!-- Main wrapper -->
     <div class="d-flex" id="wrapper">

@@ -120,7 +120,7 @@ VALUES
     (
         1,
         'Glow Agenda',
-        'Glow Agenda Salon',
+        'Glow Agenda',
         '12.345.678/0001-90',
         '(11) 99999-0000',
         'contato@glowagenda.com',

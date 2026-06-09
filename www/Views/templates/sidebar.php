@@ -1,49 +1,85 @@
         <!-- Sidebar -->
-        <div class="bg-white shadow-sm" id="sidebar-wrapper" style="width: 250px; min-height: 100vh;">
-            <div class="sidebar-heading text-center py-4 border-bottom">
-                <h4 class="text-primary fw-bold mb-0"><i class="bi bi-stars"></i> Glow Agenda</h4>
+        <div id="sidebar-wrapper" class="sidebar-wrapper">
+            <div class="sidebar-brand">
+                <div class="sidebar-brand__icon">
+                    <i class="bi bi-moon-stars-fill"></i>
+                </div>
+                <div class="sidebar-brand__text">
+                    <span class="sidebar-brand__title">Glow Agenda</span>
+                    <span class="sidebar-brand__subtitle">Experiência premium</span>
+                </div>
             </div>
-            <div class="list-group list-group-flush my-3">
-                <a href="<?php echo base_url('dashboard'); ?>" class="list-group-item list-group-item-action bg-transparent border-0 px-4 py-3 fw-medium <?php echo (strpos($_SERVER['REQUEST_URI'], 'dashboard') !== false) ? 'active text-primary' : 'text-secondary'; ?>">
-                    <i class="bi bi-grid-fill me-2"></i> Dashboard
+
+            <?php $role = $_SESSION['usuario_perfil'] ?? ''; ?>
+            <?php
+                $dashboardActive = strpos($_SERVER['REQUEST_URI'], 'dashboard') !== false;
+                $agLink   = $role === 'cliente' ? 'cliente/agendamentos' : 'agendamentos';
+                $agActive = strpos($_SERVER['REQUEST_URI'], $agLink) !== false;
+                $agLabel  = $role === 'cliente' ? 'Meus agendamentos' : 'Agendamentos';
+                $servicosActive = strpos($_SERVER['REQUEST_URI'], 'servicos') !== false;
+                $clientesActive = strpos($_SERVER['REQUEST_URI'], 'clientes') !== false;
+                $profActive     = strpos($_SERVER['REQUEST_URI'], 'profissionais') !== false;
+                $estabActive    = strpos($_SERVER['REQUEST_URI'], 'estabelecimento') !== false;
+                $configActive   = strpos($_SERVER['REQUEST_URI'], 'configuracoes') !== false;
+            ?>
+
+            <nav class="sidebar-nav">
+                <a href="<?php echo base_url('dashboard'); ?>" class="sidebar-link <?php echo $dashboardActive ? 'is-active' : ''; ?>">
+                    <i class="bi bi-grid-fill"></i>
+                    <span>Dashboard</span>
                 </a>
-                <?php $role = $_SESSION['usuario_perfil'] ?? ''; ?>
-                <?php
-                    $agLink   = $role === 'cliente' ? 'cliente/agendamentos' : 'agendamentos';
-                    $agActive = strpos($_SERVER['REQUEST_URI'], $agLink) !== false;
-                    $agLabel  = $role === 'cliente' ? 'Meus agendamentos' : 'Agendamentos';
-                ?>
-                <a href="<?php echo base_url($agLink); ?>" class="list-group-item list-group-item-action bg-transparent border-0 px-4 py-3 fw-medium <?php echo $agActive ? 'active text-primary' : 'text-secondary'; ?>">
-                    <i class="bi bi-calendar-event-fill me-2"></i> <?php echo $agLabel; ?>
+
+                <a href="<?php echo base_url($agLink); ?>" class="sidebar-link <?php echo $agActive ? 'is-active' : ''; ?>">
+                    <i class="bi bi-calendar-event-fill"></i>
+                    <span><?php echo $agLabel; ?></span>
                 </a>
+
                 <?php if ($role === 'admin' || $role === 'profissional'): ?>
-                    <a href="<?php echo base_url('servicos'); ?>" class="list-group-item list-group-item-action bg-transparent border-0 px-4 py-3 fw-medium <?php echo (strpos($_SERVER['REQUEST_URI'], 'servicos') !== false) ? 'active text-primary' : 'text-secondary'; ?>">
-                        <i class="bi bi-scissors me-2"></i> Serviços
+                    <a href="<?php echo base_url('servicos'); ?>" class="sidebar-link <?php echo $servicosActive ? 'is-active' : ''; ?>">
+                        <i class="bi bi-scissors"></i>
+                        <span>Serviços</span>
                     </a>
-                    <a href="<?php echo base_url('clientes'); ?>" class="list-group-item list-group-item-action bg-transparent border-0 px-4 py-3 fw-medium <?php echo (strpos($_SERVER['REQUEST_URI'], 'clientes') !== false) ? 'active text-primary' : 'text-secondary'; ?>">
-                        <i class="bi bi-people-fill me-2"></i> Clientes
+                    <a href="<?php echo base_url('clientes'); ?>" class="sidebar-link <?php echo $clientesActive ? 'is-active' : ''; ?>">
+                        <i class="bi bi-people-fill"></i>
+                        <span>Clientes</span>
                     </a>
                 <?php endif; ?>
+
                 <?php if ($role === 'admin'): ?>
-                    <a href="<?php echo base_url('profissionais'); ?>" class="list-group-item list-group-item-action bg-transparent border-0 px-4 py-3 fw-medium <?php echo (strpos($_SERVER['REQUEST_URI'], 'profissionais') !== false) ? 'active text-primary' : 'text-secondary'; ?>">
-                        <i class="bi bi-person-gear me-2"></i> Profissionais
+                    <a href="<?php echo base_url('profissionais'); ?>" class="sidebar-link <?php echo $profActive ? 'is-active' : ''; ?>">
+                        <i class="bi bi-person-gear"></i>
+                        <span>Profissionais</span>
                     </a>
                 <?php endif; ?>
+
                 <?php if ($role === 'admin' || $role === 'profissional'): ?>
-                    <a href="<?php echo base_url('estabelecimento'); ?>" class="list-group-item list-group-item-action bg-transparent border-0 px-4 py-3 fw-medium <?php echo (strpos($_SERVER['REQUEST_URI'], 'estabelecimento') !== false) ? 'active text-primary' : 'text-secondary'; ?>">
-                        <i class="bi bi-building me-2"></i> Meu Salão
+                    <a href="<?php echo base_url('estabelecimento'); ?>" class="sidebar-link <?php echo $estabActive ? 'is-active' : ''; ?>">
+                        <i class="bi bi-building"></i>
+                        <span>Meu Salão</span>
                     </a>
                 <?php endif; ?>
-                
-                <hr class="mx-3 text-secondary">
-                
-                <?php $configActive = strpos($_SERVER['REQUEST_URI'], 'configuracoes') !== false; ?>
-                <a href="<?php echo base_url('configuracoes'); ?>" class="list-group-item list-group-item-action bg-transparent border-0 px-4 py-3 fw-medium <?php echo $configActive ? 'active text-primary' : 'text-secondary'; ?>">
-                    <i class="bi bi-gear-fill me-2"></i> Configurações
+
+                <div class="sidebar-divider"></div>
+
+                <a href="<?php echo base_url('configuracoes'); ?>" class="sidebar-link <?php echo $configActive ? 'is-active' : ''; ?>">
+                    <i class="bi bi-gear-fill"></i>
+                    <span>Configurações</span>
                 </a>
-                <a href="<?php echo base_url('logout'); ?>" class="list-group-item list-group-item-action bg-transparent border-0 px-4 py-3 fw-medium text-danger mt-5">
-                    <i class="bi bi-box-arrow-right me-2"></i> Sair
+
+                <a href="<?php echo base_url('logout'); ?>" class="sidebar-link sidebar-link--logout">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Sair</span>
                 </a>
+            </nav>
+
+            <div class="sidebar-help">
+                <div class="sidebar-help__icon">
+                    <i class="bi bi-headset"></i>
+                </div>
+                <div class="sidebar-help__text">
+                    <span class="sidebar-help__label">Precisa de ajuda?</span>
+                    <a href="mailto:contato@glowagenda.com" class="sidebar-help__link">Fale com o suporte</a>
+                </div>
             </div>
         </div>
         <!-- /#sidebar-wrapper -->
@@ -51,20 +87,20 @@
         <!-- Page Content -->
         <div id="page-content-wrapper" class="w-100">
             
-            <nav class="navbar navbar-expand-lg navbar-light bg-white py-3 px-4 shadow-sm">
+            <nav class="navbar glow-topbar">
                 <div class="d-flex align-items-center">
-                    <i class="bi bi-list fs-3 text-secondary me-3" id="menu-toggle" style="cursor: pointer;"></i>
-                    <h5 class="mb-0 fw-semibold text-dark"><?php echo isset($pagina) ? $pagina : 'Glow Agenda'; ?></h5>
+                    <i class="bi bi-list fs-3 glow-topbar__menu" id="menu-toggle" role="button"></i>
+                    <h5 class="mb-0 fw-semibold glow-topbar__title"><?php echo isset($pagina) ? $pagina : 'Glow Agenda'; ?></h5>
                 </div>
-                
+
                 <div class="ms-auto d-flex align-items-center">
                     <div class="dropdown">
-                        <a class="nav-link dropdown-toggle text-dark fw-medium" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-person-circle fs-4 text-secondary me-1 align-middle"></i>
+                        <a class="nav-link dropdown-toggle glow-topbar__user" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle fs-4 me-1 align-middle"></i>
                             <?php echo htmlspecialchars($_SESSION['usuario_nome'] ?? 'Usuário'); ?>
-                            <small class="text-muted ms-1">(<?php echo htmlspecialchars($_SESSION['usuario_perfil'] ?? ''); ?>)</small>
+                            <small class="ms-1 text-muted"><?php echo htmlspecialchars($_SESSION['usuario_perfil'] ?? ''); ?></small>
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm" aria-labelledby="navbarDropdown">
+                        <ul class="dropdown-menu dropdown-menu-end glow-dropdown" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="<?php echo base_url('configuracoes'); ?>"><i class="bi bi-person me-2"></i> Meu Perfil</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item text-danger" href="<?php echo base_url('logout'); ?>"><i class="bi bi-box-arrow-right me-2"></i> Sair</a></li>
@@ -73,4 +109,4 @@
                 </div>
             </nav>
 
-            <div class="container-fluid p-4">
+            <div class="container-fluid glow-content">
