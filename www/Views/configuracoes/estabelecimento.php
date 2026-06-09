@@ -26,7 +26,9 @@
                     );
                 ?>
 
-                <form action="<?php echo base_url('estabelecimento/salvar'); ?>" method="POST" class="row g-3">
+                <?php $logoAtual = $dadosForm['logo'] ?? ($estabelecimento['logo'] ?? ''); ?>
+
+                <form action="<?php echo base_url('estabelecimento/salvar'); ?>" method="POST" enctype="multipart/form-data" class="row g-3">
                     <div class="col-12">
                         <label class="form-label fw-medium">Nome do salão *</label>
                         <input type="text" class="form-control" name="nome" value="<?php echo htmlspecialchars($dadosForm['nome'] ?? ''); ?>" required>
@@ -80,6 +82,21 @@
                     <div class="col-md-4">
                         <label class="form-label fw-medium">Site</label>
                         <input type="url" class="form-control" name="site" value="<?php echo htmlspecialchars($dadosForm['site'] ?? ''); ?>" placeholder="https://...">
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label fw-medium">Foto do estabelecimento</label>
+                        <?php if (!empty($logoAtual)): ?>
+                            <div class="mb-3">
+                                <img src="<?php echo base_url($logoAtual); ?>" alt="Foto atual do estabelecimento" class="img-fluid rounded border" style="max-height: 220px; object-fit: cover;">
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" name="remover_logo" id="removerLogo">
+                                <label class="form-check-label" for="removerLogo">Remover foto atual</label>
+                            </div>
+                        <?php endif; ?>
+                        <input type="file" class="form-control" name="logo" accept="image/jpeg,image/png,image/webp">
+                        <small class="text-muted">Formatos permitidos: JPG, PNG ou WEBP (até 2MB).</small>
                     </div>
 
                     <div class="col-12 d-flex justify-content-end gap-2 pt-3">

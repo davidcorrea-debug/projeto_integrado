@@ -35,7 +35,13 @@
             <div class="col-12 col-lg-6">
                 <div class="card shadow-sm border-0 p-4 rounded-4 h-100">
                     <div class="card-body d-flex flex-column justify-content-center text-center text-lg-start">
-                        <i class="bi bi-stars text-primary mb-3" style="font-size: 3rem;"></i>
+                        <?php if (!empty($dadosEstabelecimento['logo'])): ?>
+                            <div class="mb-4 text-center">
+                                <img src="<?php echo base_url($dadosEstabelecimento['logo']); ?>" alt="Foto do estabelecimento" class="img-fluid rounded-4 shadow-sm" style="max-height: 220px; object-fit: cover;">
+                            </div>
+                        <?php else: ?>
+                            <i class="bi bi-stars text-primary mb-3" style="font-size: 3rem;"></i>
+                        <?php endif; ?>
                         <h1 class="h3 mb-2 fw-bold">Bem-vindo(a) ao <?php echo htmlspecialchars($nomeSalao); ?></h1>
                         <p class="text-muted mb-4">Faça login para agendar horários, acompanhar seus serviços e gerenciar sua experiência no salão.</p>
                         <div class="d-flex gap-3 justify-content-center justify-content-lg-start flex-wrap">

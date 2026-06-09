@@ -14,7 +14,7 @@ class EstabelecimentoModel extends Database
     public function obter(): ?array
     {
         $stmt = $this->execute(
-            "SELECT id, nome, nome_fantasia, cnpj, telefone, email, endereco, cep, localizacao_url, instagram, facebook, site
+            "SELECT id, nome, nome_fantasia, cnpj, telefone, email, endereco, cep, localizacao_url, instagram, facebook, site, logo
              FROM estabelecimento
              ORDER BY id ASC
              LIMIT 1"
@@ -27,7 +27,7 @@ class EstabelecimentoModel extends Database
     public function obterSemCache(): ?array
     {
         $stmt = $this->execute(
-            "SELECT id, nome, nome_fantasia, cnpj, telefone, email, endereco, cep, localizacao_url, instagram, facebook, site
+            "SELECT id, nome, nome_fantasia, cnpj, telefone, email, endereco, cep, localizacao_url, instagram, facebook, site, logo
              FROM estabelecimento
              ORDER BY id ASC
              LIMIT 1"
@@ -71,6 +71,7 @@ class EstabelecimentoModel extends Database
             'instagram',
             'facebook',
             'site',
+            'logo',
         ];
 
         $resultado = [];

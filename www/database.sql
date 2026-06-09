@@ -111,10 +111,11 @@ CREATE TABLE estabelecimento (
     instagram        VARCHAR(120),
     facebook         VARCHAR(120),
     site             VARCHAR(120),
+    logo             VARCHAR(255),
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-INSERT INTO estabelecimento (id, nome, nome_fantasia, cnpj, telefone, email, endereco, cep, localizacao_url, instagram, facebook, site)
+INSERT INTO estabelecimento (id, nome, nome_fantasia, cnpj, telefone, email, endereco, cep, localizacao_url, instagram, facebook, site, logo)
 VALUES
     (
         1,
@@ -128,7 +129,8 @@ VALUES
         'https://maps.google.com/?q=Av.+Paulista,+1000',
         'https://instagram.com/glowagenda',
         'https://facebook.com/glowagenda',
-        'https://glowagenda.com'
+        'https://glowagenda.com',
+        NULL
     )
 ON DUPLICATE KEY UPDATE
     nome = VALUES(nome),
@@ -141,7 +143,8 @@ ON DUPLICATE KEY UPDATE
     localizacao_url = VALUES(localizacao_url),
     instagram = VALUES(instagram),
     facebook = VALUES(facebook),
-    site = VALUES(site);
+    site = VALUES(site),
+    logo = VALUES(logo);
 -- ============================================================
 -- Dados iniciais: Categorias
 -- ============================================================
