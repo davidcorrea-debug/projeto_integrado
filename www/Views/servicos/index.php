@@ -125,7 +125,7 @@
             <div class="card shadow-sm h-100 <?php echo !$s['servico_ativo'] ? 'opacity-75' : ''; ?>">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start mb-2">
-                        <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill">
+                        <span class="badge badge-categoria rounded-pill">
                             <?php echo htmlspecialchars($s['categoria_nome']); ?>
                         </span>
                         <?php if ($s['servico_ativo']): ?>
