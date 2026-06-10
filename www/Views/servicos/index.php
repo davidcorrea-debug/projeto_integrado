@@ -13,6 +13,26 @@
                 data-bs-toggle="modal" data-bs-target="#modalNovaCategoria">
             <i class="bi bi-tags-fill me-1"></i> Nova Categoria
         </button>
+        <?php if (($role ?? '') === 'admin' && !empty($categoriasSemUso)): ?>
+            <?php
+                $listaCategorias = array_map(function ($cat) {
+                    return '<li class=\'mb-1\'><i class=\'bi bi-dot text-warning me-1\'></i>' . htmlspecialchars($cat['categoria_nome'] ?? '') . '</li>';
+                }, $categoriasSemUso);
+                $popoverContent = '<div class="fw-semibold small mb-2 text-warning">Categorias sem serviços ativos</div>' .
+                    '<ul class="list-unstyled mb-0 small">' . implode('', $listaCategorias) . '</ul>';
+            ?>
+            <button type="button"
+                    class="btn btn-light btn-sm rounded-circle shadow-sm d-flex align-items-center justify-content-center unused-categories-indicator"
+                    data-bs-toggle="popover"
+                    data-bs-trigger="focus"
+                    data-bs-placement="bottom"
+                    data-bs-html="true"
+                    title="Categorias livres"
+                    data-bs-content="<?php echo htmlspecialchars($popoverContent, ENT_QUOTES, 'UTF-8'); ?>"
+                    aria-label="Categorias sem uso">
+                <i class="bi bi-exclamation-triangle-fill text-warning"></i>
+            </button>
+        <?php endif; ?>
     </div>
 </div>
 
@@ -107,6 +127,53 @@
     </div>
 </div>
 
+<?php if (($role ?? '') === 'admin'): ?>
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center px-4 py-3">
+        <h5 class="mb-0 fw-semibold">Categorias cadastradas</h5>
+        <span class="badge bg-light text-dark fw-semibold">Total: <?php echo count($categorias); ?></span>
+    </div>
+    <div class="card-body pt-0 px-0">
+        <?php if (empty($categorias)): ?>
+            <div class="p-4 text-muted text-center">Nenhuma categoria cadastrada.</div>
+        <?php else: ?>
+            <div class="list-group list-group-flush">
+                <?php foreach ($categorias as $cat):
+                    $catId = (int)($cat['categoria_id'] ?? 0);
+                    $stats = $categoriasStats[$catId] ?? ['total' => 0, 'ativos' => 0];
+                    $totalServicos = (int)($stats['total'] ?? 0);
+                    $ativosServicos = (int)($stats['ativos'] ?? 0);
+                    $podeExcluir = $totalServicos === 0;
+                ?>
+                <div class="list-group-item px-4 py-3 d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
+                    <div>
+                        <h6 class="mb-1 fw-semibold text-dark"><?php echo htmlspecialchars($cat['categoria_nome'] ?? ''); ?></h6>
+                        <div class="small text-muted">
+                            Serviços vinculados: <strong><?php echo $totalServicos; ?></strong>
+                            <?php if ($totalServicos > 0): ?>
+                                (<?php echo $ativosServicos; ?> ativos)
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-light text-dark">ID: <?php echo $catId; ?></span>
+                        <form action="<?php echo base_url('servicos/categorias/excluir/' . $catId); ?>" method="POST" class="d-inline">
+                            <button type="submit"
+                                    class="btn btn-sm <?php echo $podeExcluir ? 'btn-outline-danger' : 'btn-outline-secondary'; ?> rounded-pill"
+                                    <?php echo $podeExcluir ? '' : 'disabled'; ?>
+                                    <?php echo $podeExcluir ? "onclick=\"return confirm('Excluir a categoria " . htmlspecialchars($cat['categoria_nome'] ?? '', ENT_QUOTES, 'UTF-8') . "? Esta ação não pode ser desfeita.')\"" : 'title="Conclua os agendamentos e remova os serviços desta categoria antes de excluir."'; ?>>
+                                <i class="bi bi-trash me-1"></i> Excluir
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+<?php endif; ?>
+
 <!-- Grid de Serviços -->
 <div class="row g-4">
     <?php if (empty($servicos)): ?>
@@ -155,14 +222,34 @@
                        class="btn btn-sm btn-outline-secondary rounded-pill">
                         <i class="bi bi-pencil me-1"></i> Editar
                     </a>
-                    <a href="<?php echo base_url('servicos/excluir/' . $s['servico_id']); ?>"
-                       class="btn btn-sm btn-outline-danger rounded-pill"
-                       onclick="return confirm('Excluir este serviço?')">
-                        <i class="bi bi-trash"></i>
-                    </a>
+                    <?php if ($s['servico_ativo']): ?>
+                        <form action="<?php echo base_url('servicos/desativar/' . $s['servico_id']); ?>" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill"
+                                    onclick="return confirm('Desativar este serviço? Ele não aparecerá mais para agendamentos.');">
+                                <i class="bi bi-pause-circle me-1"></i> Desativar
+                            </button>
+                        </form>
+                    <?php else: ?>
+                        <form action="<?php echo base_url('servicos/ativar/' . $s['servico_id']); ?>" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-success rounded-pill">
+                                <i class="bi bi-play-circle me-1"></i> Ativar
+                            </button>
+                        </form>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
         <?php endforeach; ?>
     <?php endif; ?>
 </div>
+
+<?php if (($role ?? '') === 'admin' && !empty($categoriasSemUso)): ?>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    if (typeof bootstrap === 'undefined' || !bootstrap.Popover) return;
+    document.querySelectorAll('.unused-categories-indicator').forEach(function (element) {
+        new bootstrap.Popover(element);
+    });
+});
+</script>
+<?php endif; ?>
