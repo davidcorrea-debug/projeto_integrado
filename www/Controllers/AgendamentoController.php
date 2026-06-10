@@ -79,11 +79,27 @@ class AgendamentoController
             }
         }
 
+        $usuarios = (method_exists($this->usuarioModel, 'listarPorTipo') ? $this->usuarioModel->listarPorTipo('profissional') : $this->usuarioModel->listar());
+        $profissionalSelecionado = null;
+        $bloqueiaSelecaoProfissional = false;
+
+        if (function_exists('hasRole') && hasRole(['profissional']) && function_exists('currentUserId')) {
+            $usuarioAtualId = (int) currentUserId();
+            $profAtual = $this->usuarioModel->buscarPorId($usuarioAtualId);
+            if ($profAtual && ($profAtual['usuario_perfil'] ?? '') === 'profissional') {
+                $usuarios = [$profAtual];
+                $profissionalSelecionado = $usuarioAtualId;
+                $bloqueiaSelecaoProfissional = true;
+            }
+        }
+
         view('agendamentos/form', [
             'pagina'    => 'Novo Agendamento',
             'clientes'  => $clientes,
             'servicos'  => $this->servicoModel->listarAtivos(),
-            'usuarios'  => (method_exists($this->usuarioModel, 'listarPorTipo') ? $this->usuarioModel->listarPorTipo('profissional') : $this->usuarioModel->listar()),
+            'usuarios'  => $usuarios,
+            'profissionalSelecionado' => $profissionalSelecionado,
+            'bloqueiaSelecaoProfissional' => $bloqueiaSelecaoProfissional,
             'msg'       => $msg,
         ]);
     }
@@ -109,6 +125,10 @@ class AgendamentoController
             'agendamento_obs'     => trim($_POST['agendamento_obs'] ?? ''),
             'agendamento_status'  => 'aguardando',
         ];
+
+        if (function_exists('hasRole') && hasRole(['profissional']) && function_exists('currentUserId')) {
+            $dados['usuario_id'] = (int) currentUserId();
+        }
 
         // Se for cliente, força o cliente_id para o do usuário logado e valida profissional
         if ($isCliente) {
