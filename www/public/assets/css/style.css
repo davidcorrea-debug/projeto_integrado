@@ -1040,6 +1040,7 @@ body {
     flex-wrap: wrap;
     justify-content: flex-start;
     border: 1px solid rgba(214, 51, 132, 0.18);
+    max-width: 100%;
 }
 
 .salon-preview__logo {
@@ -1067,6 +1068,7 @@ body {
     gap: 0.15rem;
     min-width: 0;
     flex: 1 1 160px;
+    max-width: 100%;
 }
 
 .salon-preview__name {
@@ -1075,6 +1077,7 @@ body {
     color: rgba(33, 37, 41, 0.88);
     word-break: break-word;
     hyphens: auto;
+    max-width: 100%;
 }
 
 .salon-preview__tagline {
@@ -1083,6 +1086,7 @@ body {
     color: rgba(33, 37, 41, 0.55);
     margin-top: 0.3rem;
     word-break: break-word;
+    max-width: 100%;
 }
 
 @media (max-width: 576px) {
