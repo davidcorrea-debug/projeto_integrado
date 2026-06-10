@@ -33,6 +33,14 @@ body {
     justify-content: flex-start;
 }
 
+.client-dashboard__actions .btn {
+    flex: 1 1 260px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3.25rem;
+}
+
 .client-card__header h5 {
     color: rgba(33, 37, 41, 0.85);
 }
