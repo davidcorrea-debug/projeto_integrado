@@ -32,8 +32,9 @@
                         <span class="text-muted small">Resumo do compromisso mais recente agendado</span>
                     </div>
                     <?php if ($proximaSessao): ?>
-                        <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 ms-lg-auto">
-                            <?php echo formatarData($proximaSessao['agendamento_data']); ?> às <?php echo substr($proximaSessao['agendamento_hora'] ?? '', 0, 5); ?>
+                        <span class="client-chip ms-lg-auto">
+                            <i class="bi bi-calendar-event me-2 text-primary"></i>
+                            <span><?php echo formatarData($proximaSessao['agendamento_data']); ?> às <?php echo substr($proximaSessao['agendamento_hora'] ?? '', 0, 5); ?></span>
                         </span>
                     <?php endif; ?>
                 </div>
