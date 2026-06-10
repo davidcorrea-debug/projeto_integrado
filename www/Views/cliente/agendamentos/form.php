@@ -5,7 +5,7 @@
         <div class="card shadow-sm border-0">
             <div class="card-header bg-white border-bottom py-3">
                 <h5 class="mb-0 fw-semibold"><?php echo htmlspecialchars($pagina ?? 'Agendamento'); ?></h5>
-                <small class="text-muted">Lembre-se: alterações de data/hora são permitidas até 12 horas antes do compromisso.</small>
+                <small class="text-muted">Lembre-se: alterações de data/hora são permitidas até 2 horas antes do compromisso.</small>
             </div>
             <div class="card-body p-4">
                 <form action="<?php echo htmlspecialchars($action); ?>" method="POST" class="needs-validation" novalidate>
