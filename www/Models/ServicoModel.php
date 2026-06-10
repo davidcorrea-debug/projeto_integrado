@@ -41,6 +41,34 @@ class ServicoModel extends Database
     }
 
     /**
+     * Retorna contagem de serviços por categoria (total e ativos)
+     */
+    public function contagemPorCategoria(): array
+    {
+        $stmt = $this->execute(
+            "SELECT categoria_id,
+                    COUNT(*) AS total,
+                    SUM(CASE WHEN servico_ativo = 1 THEN 1 ELSE 0 END) AS ativos
+             FROM servicos
+             GROUP BY categoria_id"
+        );
+
+        $map = [];
+        foreach ($stmt->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+            $id = (int)($row['categoria_id'] ?? 0);
+            if (!$id) {
+                continue;
+            }
+            $map[$id] = [
+                'total'  => (int)($row['total'] ?? 0),
+                'ativos' => (int)($row['ativos'] ?? 0),
+            ];
+        }
+
+        return $map;
+    }
+
+    /**
      * Busca serviço por ID (com categoria)
      */
     public function buscarPorId(int $id): ?array
@@ -85,11 +113,35 @@ class ServicoModel extends Database
     }
 
     /**
-     * Remove serviço
+     * Atualiza flag de serviço ativo/inativo
+     */
+    public function atualizarStatusAtivo(int $id, bool $ativo): bool
+    {
+        return $this->update("servico_id = {$id}", ['servico_ativo' => $ativo ? 1 : 0]);
+    }
+
+    /**
+     * Desativa serviço sem remover o registro
+     */
+    public function desativar(int $id): bool
+    {
+        return $this->atualizarStatusAtivo($id, false);
+    }
+
+    /**
+     * Reativa serviço previamente desativado
+     */
+    public function ativar(int $id): bool
+    {
+        return $this->atualizarStatusAtivo($id, true);
+    }
+
+    /**
+     * Mantido por compatibilidade: realiza desativação lógica
      */
     public function remover(int $id): bool
     {
-        return $this->delete("servico_id = {$id}");
+        return $this->desativar($id);
     }
 
     /**
