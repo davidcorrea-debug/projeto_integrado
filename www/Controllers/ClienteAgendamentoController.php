@@ -301,13 +301,13 @@ class ClienteAgendamentoController
         }
 
         $dataHoraAtual = $this->montarDataHora($agendamento['agendamento_data'] ?? null, $agendamento['agendamento_hora'] ?? null);
-        $limite         = new \DateTime('+12 hours');
+        $limite         = new \DateTime('+2 hours');
 
         $alterouData = $dados['agendamento_data'] !== ($agendamento['agendamento_data'] ?? '')
             || $dados['agendamento_hora'] !== ($agendamento['agendamento_hora'] ?? '');
 
         if ($alterouData && $dataHoraAtual && $dataHoraAtual < $limite) {
-            $_SESSION['msg'] = msg('Remarcações só são permitidas com pelo menos 12 horas de antecedência.', 'warning');
+            $_SESSION['msg'] = msg('Remarcações só são permitidas com pelo menos 2 horas de antecedência.', 'warning');
             redirect("cliente/agendamentos/{$id}/editar");
         }
 
@@ -332,6 +332,14 @@ class ClienteAgendamentoController
 
         if (($agendamento['agendamento_status'] ?? '') === 'cancelado') {
             $_SESSION['msg'] = msg('Este agendamento já foi cancelado anteriormente.', 'info');
+            redirect('cliente/agendamentos');
+        }
+
+        $dataHora = $this->montarDataHora($agendamento['agendamento_data'] ?? null, $agendamento['agendamento_hora'] ?? null);
+        $limite   = new \DateTime('+2 hours');
+
+        if ($dataHora && $dataHora < $limite) {
+            $_SESSION['msg'] = msg('Cancelamentos só são permitidos com pelo menos 2 horas de antecedência.', 'warning');
             redirect('cliente/agendamentos');
         }
 

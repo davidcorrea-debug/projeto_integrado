@@ -17,7 +17,7 @@
             <a href="<?php echo base_url('agendamentos?data=' . $dataProxima); ?>" class="btn agenda-date-btn"><i class="bi bi-chevron-right"></i></a>
         </div>
     </div>
-    <div class="col-md-8 d-flex justify-content-md-end mt-3 mt-md-0">
+    <div class="col-md-8 d-flex justify-content-md-end mt-3 mt-md-0 flex-wrap gap-2 gap-md-3">
         <div class="btn-group me-3 shadow-sm agenda-toggle-group" role="group">
             <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
             <label class="btn agenda-toggle" for="btnradio1">Lista</label>
@@ -28,9 +28,11 @@
             <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
             <label class="btn agenda-toggle" for="btnradio3">Semana</label>
         </div>
-        <select class="form-select agenda-select w-auto shadow-sm">
-            <option selected>Todos os Profissionais</option>
-        </select>
+        <?php if (($role ?? '') === 'admin'): ?>
+            <select class="form-select agenda-select w-auto shadow-sm">
+                <option selected>Todos os Profissionais</option>
+            </select>
+        <?php endif; ?>
     </div>
 </div>
 

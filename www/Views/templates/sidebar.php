@@ -16,7 +16,6 @@
                 $agActive = strpos($_SERVER['REQUEST_URI'], $agLink) !== false;
                 $agLabel  = $role === 'cliente' ? 'Meus agendamentos' : 'Agendamentos';
                 $servicosActive = strpos($_SERVER['REQUEST_URI'], 'servicos') !== false;
-                $clientesActive = strpos($_SERVER['REQUEST_URI'], 'clientes') !== false;
                 $profActive     = strpos($_SERVER['REQUEST_URI'], 'profissionais') !== false;
                 $estabActive    = strpos($_SERVER['REQUEST_URI'], 'estabelecimento') !== false;
                 $configActive   = strpos($_SERVER['REQUEST_URI'], 'configuracoes') !== false;
@@ -37,10 +36,6 @@
                     <a href="<?php echo base_url('servicos'); ?>" class="sidebar-link <?php echo $servicosActive ? 'is-active' : ''; ?>">
                         <i class="bi bi-scissors"></i>
                         <span>Serviços</span>
-                    </a>
-                    <a href="<?php echo base_url('clientes'); ?>" class="sidebar-link <?php echo $clientesActive ? 'is-active' : ''; ?>">
-                        <i class="bi bi-people-fill"></i>
-                        <span>Clientes</span>
                     </a>
                 <?php endif; ?>
 
@@ -71,15 +66,6 @@
                 </a>
             </nav>
 
-            <div class="sidebar-help">
-                <div class="sidebar-help__icon">
-                    <i class="bi bi-whatsapp"></i>
-                </div>
-                <div class="sidebar-help__text">
-                    <span class="sidebar-help__label">Atendimento rápido</span>
-                    <a href="https://wa.me/5562999878711" target="_blank" rel="noopener noreferrer" class="sidebar-help__link">Falar no WhatsApp</a>
-                </div>
-            </div>
         </div>
         <!-- /#sidebar-wrapper -->
 

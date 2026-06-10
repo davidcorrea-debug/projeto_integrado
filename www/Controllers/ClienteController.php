@@ -10,6 +10,13 @@ class ClienteController
 {
     private ClienteModel $model;
 
+    private function bloquearAcesso(): void
+    {
+        if (function_exists('hasRole') && hasRole(['admin', 'profissional'])) {
+            redirect('dashboard');
+        }
+    }
+
     public function __construct()
     {
         $this->model = new ClienteModel();
@@ -17,7 +24,7 @@ class ClienteController
 
     public function index(): void
     {
-        if (function_exists('requireRole')) requireRole(['admin','profissional']);
+        $this->bloquearAcesso();
         $busca   = trim($_GET['busca'] ?? '');
         $clientes = $this->model->listar($busca);
 
@@ -30,7 +37,7 @@ class ClienteController
 
     public function novo(): void
     {
-        if (function_exists('requireRole')) requireRole(['admin','profissional']);
+        $this->bloquearAcesso();
         $msg = $_SESSION['msg'] ?? '';
         unset($_SESSION['msg']);
         view('clientes/form', ['pagina' => 'Novo Cliente', 'cliente' => [], 'msg' => $msg]);
@@ -41,7 +48,7 @@ class ClienteController
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             redirect('clientes');
         }
-        if (function_exists('requireRole')) requireRole(['admin','profissional']);
+        $this->bloquearAcesso();
 
         $dados = [
             'cliente_nome'       => trim($_POST['cliente_nome'] ?? ''),
@@ -63,7 +70,7 @@ class ClienteController
 
     public function editar(int $id): void
     {
-        if (function_exists('requireRole')) requireRole(['admin','profissional']);
+        $this->bloquearAcesso();
         $cliente = $this->model->buscarPorId($id);
         if (!$cliente) {
             redirect('clientes');
@@ -78,7 +85,7 @@ class ClienteController
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             redirect('clientes');
         }
-        if (function_exists('requireRole')) requireRole(['admin','profissional']);
+        $this->bloquearAcesso();
 
         $dados = [
             'cliente_nome'       => trim($_POST['cliente_nome'] ?? ''),
@@ -95,7 +102,7 @@ class ClienteController
 
     public function excluir(int $id): void
     {
-        if (function_exists('requireRole')) requireRole(['admin','profissional']);
+        $this->bloquearAcesso();
         $this->model->remover($id);
         $_SESSION['msg'] = msg('Cliente removido.', 'warning');
         redirect('clientes');

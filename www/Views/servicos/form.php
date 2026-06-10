@@ -22,7 +22,7 @@
 
                     <div class="mb-3">
                         <label class="form-label fw-medium">Categoria <span class="text-danger">*</span></label>
-                        <select name="categoria_id" class="form-select" required>
+                        <select name="categoria_id" class="form-select servico-form__categoria" required>
                             <option value="">Selecione uma categoria...</option>
                             <?php foreach ($categorias as $cat): ?>
                                 <option value="<?php echo $cat['categoria_id']; ?>"
@@ -31,6 +31,9 @@
                                 </option>
                             <?php endforeach; ?>
                         </select>
+                        <small class="text-muted d-block mt-2">Não encontrou? Cadastre uma nova categoria abaixo.</small>
+                        <input type="text" name="nova_categoria" class="form-control mt-2"
+                               placeholder="Ex: Maquiagem social" value="">
                     </div>
 
                     <div class="mb-3">
