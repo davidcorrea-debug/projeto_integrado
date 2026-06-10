@@ -30,7 +30,7 @@ body {
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
-    justify-content: flex-end;
+    justify-content: flex-start;
 }
 
 .client-card__header h5 {
@@ -286,8 +286,8 @@ body {
 @media (min-width: 992px) {
     .client-dashboard__intro {
         flex-direction: row;
-        justify-content: flex-end;
-        align-items: flex-end;
+        justify-content: space-between;
+        align-items: flex-start;
     }
 }
 
