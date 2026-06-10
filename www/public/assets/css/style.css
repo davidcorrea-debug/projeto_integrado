@@ -5,6 +5,27 @@ body {
     min-height: 100vh;
 }
 
+.availability-helper {
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid rgba(var(--bs-primary-rgb), 0.12);
+    border-radius: 0.9rem;
+    padding: 1rem 1.2rem;
+}
+
+.availability-helper__slots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.availability-slot {
+    transition: transform 0.15s ease;
+}
+
+.availability-slot:hover {
+    transform: translateY(-2px);
+}
+
 /* Dashboard cliente */
 .client-dashboard {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.75), rgba(230, 232, 238, 0.9));
