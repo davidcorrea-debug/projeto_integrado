@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS `agendamentos` (
     FOREIGN KEY (`usuario_id`)  REFERENCES `usuarios`(`usuario_id`)  ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE estabelecimento (
+CREATE TABLE IF NOT EXISTS estabelecimento (
     id               TINYINT PRIMARY KEY DEFAULT 1,
     nome             VARCHAR(120),
     nome_fantasia    VARCHAR(120),
@@ -145,6 +145,12 @@ ON DUPLICATE KEY UPDATE
     facebook = VALUES(facebook),
     site = VALUES(site),
     logo = VALUES(logo);
+
+-- Ajustes para bases existentes que ainda não possuem os novos campos
+ALTER TABLE estabelecimento
+    ADD COLUMN IF NOT EXISTS cep VARCHAR(9) NULL AFTER endereco,
+    ADD COLUMN IF NOT EXISTS localizacao_url VARCHAR(255) NULL AFTER cep,
+    ADD COLUMN IF NOT EXISTS logo VARCHAR(255) NULL AFTER site;
 -- ============================================================
 -- Dados iniciais: Categorias
 -- ============================================================
