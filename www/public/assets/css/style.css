@@ -1037,6 +1037,8 @@ body {
     display: flex;
     align-items: center;
     gap: 1.25rem;
+    flex-wrap: wrap;
+    justify-content: flex-start;
     border: 1px solid rgba(214, 51, 132, 0.18);
 }
 
@@ -1048,16 +1050,31 @@ body {
     display: grid;
     place-items: center;
     box-shadow: 0 1rem 2rem rgba(214, 51, 132, 0.12);
+    overflow: hidden;
+    flex: 0 0 auto;
 }
 
 .salon-preview__logo img {
+    width: 100%;
     max-width: 60px;
+    max-height: 60px;
+    object-fit: contain;
+}
+
+.salon-preview__brand {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+    flex: 1 1 160px;
 }
 
 .salon-preview__name {
     font-size: 1.1rem;
     font-weight: 600;
     color: rgba(33, 37, 41, 0.88);
+    word-break: break-word;
+    hyphens: auto;
 }
 
 .salon-preview__tagline {
@@ -1065,6 +1082,18 @@ body {
     font-size: 0.85rem;
     color: rgba(33, 37, 41, 0.55);
     margin-top: 0.3rem;
+    word-break: break-word;
+}
+
+@media (max-width: 576px) {
+    .salon-preview__mockup {
+        justify-content: center;
+        text-align: center;
+    }
+
+    .salon-preview__brand {
+        align-items: center;
+    }
 }
 
 .salon-actions {
