@@ -222,6 +222,11 @@ class ClienteAgendamentoController
             redirect('cliente/agendamentos/novo');
         }
 
+        if ($this->agendamentoModel->existeConflitoHorario($dados['usuario_id'], $dados['agendamento_data'], $dados['agendamento_hora'])) {
+            $_SESSION['msg'] = msg('Esse profissional já possui um agendamento neste horário.', 'danger');
+            redirect('cliente/agendamentos/novo');
+        }
+
         $this->agendamentoModel->salvar($dados);
         $_SESSION['msg'] = msg('Agendamento criado com sucesso!', 'success');
         redirect('cliente/agendamentos');
@@ -287,6 +292,11 @@ class ClienteAgendamentoController
         $novaDataHora = $this->montarDataHora($dados['agendamento_data'], $dados['agendamento_hora']);
         if (!$novaDataHora || $novaDataHora <= new \DateTime()) {
             $_SESSION['msg'] = msg('Escolha uma data e horário futuros.', 'danger');
+            redirect("cliente/agendamentos/{$id}/editar");
+        }
+
+        if ($this->agendamentoModel->existeConflitoHorario($dados['usuario_id'], $dados['agendamento_data'], $dados['agendamento_hora'], $id)) {
+            $_SESSION['msg'] = msg('Esse profissional já possui um agendamento neste horário.', 'danger');
             redirect("cliente/agendamentos/{$id}/editar");
         }
 

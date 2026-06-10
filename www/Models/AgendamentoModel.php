@@ -186,6 +186,31 @@ class AgendamentoModel extends Database
     }
 
     /**
+     * Verifica se já existe agendamento no mesmo horário para o profissional
+     */
+    public function existeConflitoHorario(int $usuarioId, string $data, string $hora, ?int $ignorarId = null): bool
+    {
+        $sql = "SELECT COUNT(*) AS total
+                FROM agendamentos
+                WHERE usuario_id = ?
+                  AND agendamento_data = ?
+                  AND agendamento_hora = ?
+                  AND agendamento_status <> 'cancelado'";
+
+        $params = [$usuarioId, $data, $hora];
+
+        if (!empty($ignorarId)) {
+            $sql    .= " AND agendamento_id <> ?";
+            $params[] = $ignorarId;
+        }
+
+        $stmt = $this->execute($sql, $params);
+        $resultado = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        return ((int)($resultado['total'] ?? 0)) > 0;
+    }
+
+    /**
      * Salva novo agendamento
      */
     public function salvar(array $dados): int
@@ -257,5 +282,73 @@ class AgendamentoModel extends Database
                AND a.agendamento_status = 'concluido'"
         );
         return (float) $stmt->fetch(\PDO::FETCH_ASSOC)['total'];
+    }
+
+    public function totalHojePorProfissional(int $usuarioId): int
+    {
+        $stmt = $this->execute(
+            "SELECT COUNT(*) as total
+             FROM agendamentos
+             WHERE agendamento_data = CURDATE()
+               AND usuario_id = ?",
+            [$usuarioId]
+        );
+
+        return (int)($stmt->fetch(\PDO::FETCH_ASSOC)['total'] ?? 0);
+    }
+
+    public function receitaHojePorProfissional(int $usuarioId): float
+    {
+        $stmt = $this->execute(
+            "SELECT COALESCE(SUM(s.servico_preco), 0) as total
+             FROM agendamentos a
+             INNER JOIN servicos s ON a.servico_id = s.servico_id
+             WHERE a.agendamento_data = CURDATE()
+               AND a.usuario_id = ?
+               AND a.agendamento_status = 'concluido'",
+            [$usuarioId]
+        );
+
+        return (float)($stmt->fetch(\PDO::FETCH_ASSOC)['total'] ?? 0.0);
+    }
+
+    public function receitaMesPorProfissional(int $usuarioId): float
+    {
+        $stmt = $this->execute(
+            "SELECT COALESCE(SUM(s.servico_preco), 0) as total
+             FROM agendamentos a
+             INNER JOIN servicos s ON a.servico_id = s.servico_id
+             WHERE MONTH(a.agendamento_data) = MONTH(CURDATE())
+               AND YEAR(a.agendamento_data)  = YEAR(CURDATE())
+               AND a.usuario_id = ?
+               AND a.agendamento_status = 'concluido'",
+            [$usuarioId]
+        );
+
+        return (float)($stmt->fetch(\PDO::FETCH_ASSOC)['total'] ?? 0.0);
+    }
+
+    public function totalClientesPorProfissional(int $usuarioId): int
+    {
+        $stmt = $this->execute(
+            "SELECT COUNT(DISTINCT cliente_id) as total
+             FROM agendamentos
+             WHERE usuario_id = ?",
+            [$usuarioId]
+        );
+
+        return (int)($stmt->fetch(\PDO::FETCH_ASSOC)['total'] ?? 0);
+    }
+
+    public function totalServicosPorProfissional(int $usuarioId): int
+    {
+        $stmt = $this->execute(
+            "SELECT COUNT(DISTINCT servico_id) as total
+             FROM agendamentos
+             WHERE usuario_id = ?",
+            [$usuarioId]
+        );
+
+        return (int)($stmt->fetch(\PDO::FETCH_ASSOC)['total'] ?? 0);
     }
 }

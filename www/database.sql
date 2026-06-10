@@ -99,18 +99,49 @@ CREATE TABLE IF NOT EXISTS `agendamentos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE estabelecimento (
-    id TINYINT PRIMARY KEY DEFAULT 1,
-    nome           VARCHAR(120),
-    nome_fantasia  VARCHAR(120),
-    cnpj           VARCHAR(18),
-    telefone       VARCHAR(20),
-    email          VARCHAR(120),
-    endereco       TEXT,
-    instagram      VARCHAR(120),
-    facebook       VARCHAR(120),
-    site           VARCHAR(120),
-    updated_at     TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    id               TINYINT PRIMARY KEY DEFAULT 1,
+    nome             VARCHAR(120),
+    nome_fantasia    VARCHAR(120),
+    cnpj             VARCHAR(18),
+    telefone         VARCHAR(20),
+    email            VARCHAR(120),
+    endereco         TEXT,
+    cep              VARCHAR(9),
+    localizacao_url  VARCHAR(255),
+    instagram        VARCHAR(120),
+    facebook         VARCHAR(120),
+    site             VARCHAR(120),
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+INSERT INTO estabelecimento (id, nome, nome_fantasia, cnpj, telefone, email, endereco, cep, localizacao_url, instagram, facebook, site)
+VALUES
+    (
+        1,
+        'Glow Agenda',
+        'Glow Agenda Salon',
+        '12.345.678/0001-90',
+        '(11) 99999-0000',
+        'contato@glowagenda.com',
+        'Av. Paulista, 1000 - Bela Vista, São Paulo - SP',
+        '01310-100',
+        'https://maps.google.com/?q=Av.+Paulista,+1000',
+        'https://instagram.com/glowagenda',
+        'https://facebook.com/glowagenda',
+        'https://glowagenda.com'
+    )
+ON DUPLICATE KEY UPDATE
+    nome = VALUES(nome),
+    nome_fantasia = VALUES(nome_fantasia),
+    cnpj = VALUES(cnpj),
+    telefone = VALUES(telefone),
+    email = VALUES(email),
+    endereco = VALUES(endereco),
+    cep = VALUES(cep),
+    localizacao_url = VALUES(localizacao_url),
+    instagram = VALUES(instagram),
+    facebook = VALUES(facebook),
+    site = VALUES(site);
 -- ============================================================
 -- Dados iniciais: Categorias
 -- ============================================================

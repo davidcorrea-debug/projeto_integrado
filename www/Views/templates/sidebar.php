@@ -29,6 +29,11 @@
                         <i class="bi bi-person-gear me-2"></i> Profissionais
                     </a>
                 <?php endif; ?>
+                <?php if ($role === 'admin' || $role === 'profissional'): ?>
+                    <a href="<?php echo base_url('estabelecimento'); ?>" class="list-group-item list-group-item-action bg-transparent border-0 px-4 py-3 fw-medium <?php echo (strpos($_SERVER['REQUEST_URI'], 'estabelecimento') !== false) ? 'active text-primary' : 'text-secondary'; ?>">
+                        <i class="bi bi-building me-2"></i> Meu Salão
+                    </a>
+                <?php endif; ?>
                 
                 <hr class="mx-3 text-secondary">
                 
