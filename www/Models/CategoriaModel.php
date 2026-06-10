@@ -21,4 +21,22 @@ class CategoriaModel extends Database
         );
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+
+    public function buscarPorNome(string $nome): ?array
+    {
+        $stmt = $this->execute(
+            "SELECT * FROM categorias WHERE LOWER(categoria_nome) = LOWER(?) LIMIT 1",
+            [$nome]
+        );
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $result ?: null;
+    }
+
+    public function criar(string $nome): int
+    {
+        return (int)$this->insert([
+            'categoria_nome'  => $nome,
+            'categoria_ativo' => 1,
+        ]);
+    }
 }

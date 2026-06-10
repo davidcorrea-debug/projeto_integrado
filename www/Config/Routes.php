@@ -41,6 +41,7 @@ return [
     '/servicos/editar/{id}'         => ['ServicoController', 'editar'],
     '/servicos/atualizar/{id}'      => ['ServicoController', 'atualizar'],
     '/servicos/excluir/{id}'        => ['ServicoController', 'excluir'],
+    '/servicos/categorias/criar'    => ['ServicoController', 'criarCategoria'],
 
     // Clientes
     '/clientes'                     => ['ClienteController', 'index'],

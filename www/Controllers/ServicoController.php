@@ -67,6 +67,17 @@ class ServicoController
             'servico_ativo'     => 1,
         ];
 
+        $novaCategoria = trim($_POST['nova_categoria'] ?? '');
+        if (!empty($novaCategoria)) {
+            $categoria = $this->categoriaModel->buscarPorNome($novaCategoria);
+            if (!$categoria) {
+                $categoriaId = $this->categoriaModel->criar($novaCategoria);
+            } else {
+                $categoriaId = (int)($categoria['categoria_id'] ?? 0);
+            }
+            $dados['categoria_id'] = $categoriaId;
+        }
+
         if (empty($dados['servico_nome']) || $dados['categoria_id'] === 0) {
             $_SESSION['msg'] = msg('Nome e categoria são obrigatórios.', 'danger');
             redirect('servicos/novo');
@@ -108,8 +119,53 @@ class ServicoController
             'servico_ativo'     => isset($_POST['servico_ativo']) ? 1 : 0,
         ];
 
+        $novaCategoria = trim($_POST['nova_categoria'] ?? '');
+        if (!empty($novaCategoria)) {
+            $categoria = $this->categoriaModel->buscarPorNome($novaCategoria);
+            if (!$categoria) {
+                $categoriaId = $this->categoriaModel->criar($novaCategoria);
+            } else {
+                $categoriaId = (int)($categoria['categoria_id'] ?? 0);
+            }
+            $dados['categoria_id'] = $categoriaId;
+        }
+
+        if (empty($dados['servico_nome']) || $dados['categoria_id'] === 0) {
+            $_SESSION['msg'] = msg('Nome e categoria são obrigatórios.', 'danger');
+            redirect("servicos/editar/{$id}");
+        }
+
         $this->model->atualizar($id, $dados);
         $_SESSION['msg'] = msg('Serviço atualizado com sucesso!', 'success');
+        redirect('servicos');
+    }
+
+    public function criarCategoria(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('servicos');
+        }
+        if (function_exists('requireRole')) requireRole(['admin','profissional']);
+
+        $nome     = trim($_POST['categoria_nome'] ?? '');
+        $segmento = trim($_POST['categoria_segmento'] ?? '');
+        if ($nome === '') {
+            $_SESSION['msg'] = msg('Informe um nome válido para a categoria.', 'danger');
+            redirect('servicos');
+        }
+
+        if ($segmento !== '') {
+            $nome = $segmento . ' • ' . $nome;
+        }
+
+        $categoriaExistente = $this->categoriaModel->buscarPorNome($nome);
+        if ($categoriaExistente) {
+            $_SESSION['msg'] = msg('Essa categoria já está disponível.', 'info');
+            redirect('servicos');
+        }
+
+        $this->categoriaModel->criar($nome);
+        $_SESSION['msg'] = msg('Categoria criada com sucesso!', 'success');
         redirect('servicos');
     }
 

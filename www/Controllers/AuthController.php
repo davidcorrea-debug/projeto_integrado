@@ -25,6 +25,8 @@ class AuthController
      */
     public function login(): void
     {
+        $this->garantirProfissionalDemo();
+
         $erro    = $_SESSION['login_erro'] ?? '';
         $sucesso = $_SESSION['login_sucesso'] ?? '';
         $estabelecimento = $this->estabelecimentoModel->obter();
@@ -185,6 +187,30 @@ class AuthController
         } else {
             $_SESSION['reset_err'] = 'Falha ao redefinir a senha.';
             redirect('reset-password?token=' . urlencode($token));
+        }
+    }
+
+    private function garantirProfissionalDemo(): void
+    {
+        $emailDemo = 'prof.demo@glowagenda.com';
+
+        try {
+            $usuarioExistente = $this->model->buscarPorEmailTodos($emailDemo);
+            if ($usuarioExistente) {
+                return;
+            }
+
+            $hash = password_hash('prof456', PASSWORD_DEFAULT);
+
+            $this->model->insert([
+                'usuario_nome'   => 'Profissional Demo',
+                'usuario_email'  => $emailDemo,
+                'usuario_senha'  => $hash,
+                'usuario_perfil' => 'profissional',
+                'usuario_ativo'  => 1,
+            ]);
+        } catch (\Throwable $e) {
+            error_log('[AUTH] falha ao garantir profissional demo: ' . $e->getMessage());
         }
     }
 }
