@@ -764,6 +764,30 @@ body {
 }
 
 /* Configurações da conta */
+.config-dashboard {
+    position: relative;
+    border-radius: 2.2rem;
+    padding: clamp(1.8rem, 4vw, 3rem);
+    background: radial-gradient(120% 140% at 10% 10%, #ff8cd6 0%, rgba(255, 176, 214, 0.4) 35%, rgba(26, 14, 74, 0.95) 100%);
+    overflow: hidden;
+    margin-bottom: clamp(1.75rem, 4vw, 3rem);
+    box-shadow: 0 2rem 3.5rem rgba(18, 8, 55, 0.15);
+}
+
+.config-dashboard::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(120% 140% at 120% -20%, rgba(255, 145, 208, 0.55), transparent 70%);
+    opacity: 0.85;
+    pointer-events: none;
+}
+
+.config-dashboard > * {
+    position: relative;
+    z-index: 1;
+}
+
 .config-wrapper {
     position: relative;
     background: linear-gradient(140deg, rgba(255, 255, 255, 0.92), rgba(255, 240, 249, 0.96));

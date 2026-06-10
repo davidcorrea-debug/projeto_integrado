@@ -1,5 +1,6 @@
 <?php if (!empty($msg)) echo $msg; ?>
 
+<div class="config-dashboard">
 <section class="config-wrapper py-4 py-lg-5">
     <div class="config-container">
         <div class="config-header">
@@ -87,3 +88,4 @@
         </form>
     </div>
 </section>
+</div>
