@@ -766,9 +766,11 @@ body {
 /* Configurações da conta */
 .config-wrapper {
     position: relative;
-    background: #e6e8ee;
+    background: linear-gradient(140deg, rgba(255, 255, 255, 0.92), rgba(255, 240, 249, 0.96));
     border-radius: 1.75rem;
     padding-inline: clamp(1rem, 5vw, 3.5rem);
+    border: 1px solid rgba(214, 51, 132, 0.18);
+    box-shadow: 0 1.8rem 3.2rem rgba(203, 66, 142, 0.1);
 }
 
 .config-container {
