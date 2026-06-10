@@ -161,19 +161,22 @@ class AgendamentoController
         }
 
         if ($novoStatus === 'cancelado') {
-            $data = $agendamento['agendamento_data'] ?? null;
-            $hora = $agendamento['agendamento_hora'] ?? null;
-            if (!empty($data) && !empty($hora)) {
-                try {
-                    $dataHora = new \DateTime($data . ' ' . $hora);
-                    $limite   = new \DateTime('+2 hours');
-                    if ($dataHora < $limite) {
-                        $_SESSION['msg'] = msg('Cancelamentos só são permitidos com pelo menos 2 horas de antecedência.', 'warning');
-                        $dataRedirect = $_POST['data'] ?? $data;
-                        redirect('agendamentos?data=' . $dataRedirect);
+            $perfil = $_SESSION['usuario_perfil'] ?? '';
+            if ($perfil === 'cliente') {
+                $data = $agendamento['agendamento_data'] ?? null;
+                $hora = $agendamento['agendamento_hora'] ?? null;
+                if (!empty($data) && !empty($hora)) {
+                    try {
+                        $dataHora = new \DateTime($data . ' ' . $hora);
+                        $limite   = new \DateTime('+2 hours');
+                        if ($dataHora < $limite) {
+                            $_SESSION['msg'] = msg('Cancelamentos só são permitidos com pelo menos 2 horas de antecedência.', 'warning');
+                            $dataRedirect = $_POST['data'] ?? $data;
+                            redirect('agendamentos?data=' . $dataRedirect);
+                        }
+                    } catch (\Throwable $e) {
+                        // Se não conseguir montar a data, seguimos adiante para evitar bloquear erroneamente
                     }
-                } catch (\Throwable $e) {
-                    // Se não conseguir montar a data, seguimos adiante para evitar bloquear erroneamente
                 }
             }
         }

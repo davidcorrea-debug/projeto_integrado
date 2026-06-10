@@ -40,8 +40,11 @@ return [
     '/servicos/salvar'              => ['ServicoController', 'salvar'],
     '/servicos/editar/{id}'         => ['ServicoController', 'editar'],
     '/servicos/atualizar/{id}'      => ['ServicoController', 'atualizar'],
-    '/servicos/excluir/{id}'        => ['ServicoController', 'excluir'],
+    '/servicos/excluir/{id}'        => ['ServicoController', 'desativar'],
+    '/servicos/desativar/{id}'      => ['ServicoController', 'desativar'],
+    '/servicos/ativar/{id}'         => ['ServicoController', 'ativar'],
     '/servicos/categorias/criar'    => ['ServicoController', 'criarCategoria'],
+    '/servicos/categorias/excluir/{id}' => ['ServicoController', 'excluirCategoria'],
 
     // Clientes
     '/clientes'                     => ['ClienteController', 'index'],
