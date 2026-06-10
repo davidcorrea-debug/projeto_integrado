@@ -32,11 +32,26 @@ class CategoriaModel extends Database
         return $result ?: null;
     }
 
+    public function buscarPorId(int $id): ?array
+    {
+        $stmt = $this->execute(
+            "SELECT * FROM categorias WHERE categoria_id = ? LIMIT 1",
+            [$id]
+        );
+        $result = $stmt->fetch(\PDO::FETCH_ASSOC);
+        return $result ?: null;
+    }
+
     public function criar(string $nome): int
     {
         return (int)$this->insert([
             'categoria_nome'  => $nome,
             'categoria_ativo' => 1,
         ]);
+    }
+
+    public function remover(int $id): bool
+    {
+        return $this->delete("categoria_id = {$id}");
     }
 }
