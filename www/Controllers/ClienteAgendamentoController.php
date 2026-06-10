@@ -163,6 +163,57 @@ class ClienteAgendamentoController
         echo json_encode($payload, JSON_UNESCAPED_UNICODE);
     }
 
+    public function disponibilidades(): void
+    {
+        if (!isLoggedIn()) {
+            http_response_code(401);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode(['erro' => 'unauthenticated'], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        $this->garantirPerfilCliente();
+
+        $usuarioId      = (int)($_GET['usuario_id'] ?? 0);
+        $servicoId      = (int)($_GET['servico_id'] ?? 0);
+        $data           = $_GET['data'] ?? '';
+        $agendamentoId  = isset($_GET['agendamento_id']) ? (int)$_GET['agendamento_id'] : null;
+
+        header('Content-Type: application/json; charset=utf-8');
+
+        if (!$usuarioId || !$servicoId || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $data)) {
+            http_response_code(400);
+            echo json_encode(['erro' => 'parametros_invalidos'], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        $profissional = $this->usuarioModel->buscarPorId($usuarioId);
+        if (!$profissional || ($profissional['usuario_perfil'] ?? '') !== 'profissional') {
+            http_response_code(404);
+            echo json_encode(['erro' => 'profissional_invalido'], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        $servico = $this->servicoModel->buscarPorId($servicoId);
+        if (!$servico || (int)($servico['servico_ativo'] ?? 0) !== 1) {
+            http_response_code(404);
+            echo json_encode(['erro' => 'servico_indisponivel'], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        $duracao = (int)($servico['servico_duracao'] ?? 0);
+        if ($duracao <= 0) {
+            $duracao = 30;
+        }
+
+        $horarios = $this->agendamentoModel->calcularHorariosDisponiveis($usuarioId, $data, $duracao, 15, $agendamentoId);
+
+        echo json_encode([
+            'horarios' => $horarios,
+            'duracao'  => $duracao,
+        ], JSON_UNESCAPED_UNICODE);
+    }
+
     public function novo(): void
     {
         $cliente = $this->clienteLogado();
@@ -178,6 +229,7 @@ class ClienteAgendamentoController
             'msg'           => $msg,
             'action'        => base_url('cliente/agendamentos/salvar'),
             'agendamento'   => [
+                'agendamento_id'   => null,
                 'servico_id'        => null,
                 'usuario_id'        => null,
                 'agendamento_data'  => date('Y-m-d'),
@@ -216,14 +268,25 @@ class ClienteAgendamentoController
             redirect('cliente/agendamentos/novo');
         }
 
+        $servico = $this->servicoModel->buscarPorId($dados['servico_id']);
+        if (!$servico || (int)($servico['servico_ativo'] ?? 0) !== 1) {
+            $_SESSION['msg'] = msg('Serviço selecionado está indisponível.', 'danger');
+            redirect('cliente/agendamentos/novo');
+        }
+
+        $duracao = (int)($servico['servico_duracao'] ?? 0);
+        if ($duracao <= 0) {
+            $duracao = 30;
+        }
+
         $dataHora = $this->montarDataHora($dados['agendamento_data'], $dados['agendamento_hora']);
         if (!$dataHora || $dataHora <= new \DateTime()) {
             $_SESSION['msg'] = msg('Escolha uma data e horário futuros.', 'danger');
             redirect('cliente/agendamentos/novo');
         }
 
-        if ($this->agendamentoModel->existeConflitoHorario($dados['usuario_id'], $dados['agendamento_data'], $dados['agendamento_hora'])) {
-            $_SESSION['msg'] = msg('Esse profissional já possui um agendamento neste horário.', 'danger');
+        if ($this->agendamentoModel->temConflitoIntervalo($dados['usuario_id'], $dados['agendamento_data'], $dados['agendamento_hora'], $duracao)) {
+            $_SESSION['msg'] = msg('Esse horário não está disponível para o profissional selecionado.', 'danger');
             redirect('cliente/agendamentos/novo');
         }
 
@@ -289,14 +352,25 @@ class ClienteAgendamentoController
             redirect("cliente/agendamentos/{$id}/editar");
         }
 
+        $servico = $this->servicoModel->buscarPorId($dados['servico_id']);
+        if (!$servico || (int)($servico['servico_ativo'] ?? 0) !== 1) {
+            $_SESSION['msg'] = msg('Serviço selecionado está indisponível.', 'danger');
+            redirect("cliente/agendamentos/{$id}/editar");
+        }
+
+        $duracao = (int)($servico['servico_duracao'] ?? 0);
+        if ($duracao <= 0) {
+            $duracao = 30;
+        }
+
         $novaDataHora = $this->montarDataHora($dados['agendamento_data'], $dados['agendamento_hora']);
         if (!$novaDataHora || $novaDataHora <= new \DateTime()) {
             $_SESSION['msg'] = msg('Escolha uma data e horário futuros.', 'danger');
             redirect("cliente/agendamentos/{$id}/editar");
         }
 
-        if ($this->agendamentoModel->existeConflitoHorario($dados['usuario_id'], $dados['agendamento_data'], $dados['agendamento_hora'], $id)) {
-            $_SESSION['msg'] = msg('Esse profissional já possui um agendamento neste horário.', 'danger');
+        if ($this->agendamentoModel->temConflitoIntervalo($dados['usuario_id'], $dados['agendamento_data'], $dados['agendamento_hora'], $duracao, $id)) {
+            $_SESSION['msg'] = msg('Esse horário não está disponível para o profissional selecionado.', 'danger');
             redirect("cliente/agendamentos/{$id}/editar");
         }
 

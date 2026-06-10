@@ -153,8 +153,19 @@ class AgendamentoController
             redirect('agendamentos/novo');
         }
 
-        if ($this->model->existeConflitoHorario($dados['usuario_id'], $dados['agendamento_data'], $dados['agendamento_hora'])) {
-            $_SESSION['msg'] = msg('Esse profissional já possui um agendamento neste horário.', 'danger');
+        $servico = $this->servicoModel->buscarPorId($dados['servico_id']);
+        if (!$servico || (int)($servico['servico_ativo'] ?? 0) !== 1) {
+            $_SESSION['msg'] = msg('Serviço selecionado está indisponível.', 'danger');
+            redirect('agendamentos/novo');
+        }
+
+        $duracao = (int)($servico['servico_duracao'] ?? 0);
+        if ($duracao <= 0) {
+            $duracao = 30;
+        }
+
+        if ($this->model->temConflitoIntervalo($dados['usuario_id'], $dados['agendamento_data'], $dados['agendamento_hora'], $duracao)) {
+            $_SESSION['msg'] = msg('Esse horário não está disponível para o profissional selecionado.', 'danger');
             redirect('agendamentos/novo');
         }
 
