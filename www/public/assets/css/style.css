@@ -473,6 +473,13 @@ body {
     align-items: center;
 }
 
+.appointment-time {
+    white-space: nowrap;
+    display: inline-block;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+}
+
 .appointment-item__actions {
     display: flex;
     justify-content: space-between;
