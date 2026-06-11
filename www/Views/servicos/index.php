@@ -243,13 +243,19 @@
     <?php endif; ?>
 </div>
 
-<?php if (($role ?? '') === 'admin' && !empty($categoriasSemUso)): ?>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    if (typeof bootstrap === 'undefined' || !bootstrap.Popover) return;
-    document.querySelectorAll('.unused-categories-indicator').forEach(function (element) {
-        new bootstrap.Popover(element);
-    });
+    const categoriaModal = document.getElementById('modalNovaCategoria');
+    if (categoriaModal && categoriaModal.parentNode !== document.body) {
+        document.body.appendChild(categoriaModal);
+    }
+
+    <?php if (($role ?? '') === 'admin' && !empty($categoriasSemUso)): ?>
+    if (typeof bootstrap !== 'undefined' && bootstrap.Popover) {
+        document.querySelectorAll('.unused-categories-indicator').forEach(function (element) {
+            new bootstrap.Popover(element);
+        });
+    }
+    <?php endif; ?>
 });
 </script>
-<?php endif; ?>
