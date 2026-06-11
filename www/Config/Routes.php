@@ -67,5 +67,9 @@ return [
     '/profissionais'                => ['ProfissionalController', 'index'],
     '/profissionais/novo'           => ['ProfissionalController', 'novo'],
     '/profissionais/salvar'         => ['ProfissionalController', 'salvar'],
+    '/profissionais/{id}/horarios'  => ['HorarioTrabalhoController', 'editar'],
+    '/profissionais/{id}/horarios/salvar' => ['HorarioTrabalhoController', 'salvar'],
+    '/profissional/horarios'        => ['HorarioTrabalhoController', 'editarProprio'],
+    '/profissional/horarios/salvar' => ['HorarioTrabalhoController', 'salvarProprio'],
 ];
 
