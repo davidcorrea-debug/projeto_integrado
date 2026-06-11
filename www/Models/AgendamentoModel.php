@@ -6,9 +6,12 @@ use Models\Database;
 
 class AgendamentoModel extends Database
 {
+    private HorarioTrabalhoModel $horarioModel;
+
     public function __construct()
     {
         parent::__construct('agendamentos');
+        $this->horarioModel = new HorarioTrabalhoModel($this->getConnection());
     }
 
     /**
@@ -205,6 +208,11 @@ class AgendamentoModel extends Database
         }
 
         $fim = $inicio->add(new \DateInterval('PT' . $duracao . 'M'));
+
+        if (!$this->estaDentroDoExpediente($usuarioId, $inicio, $fim)) {
+            return true;
+        }
+
         $intervalos = $this->obterAgendaDoDia($usuarioId, $data, $ignorarId);
 
         foreach ($intervalos as $intervalo) {
@@ -221,53 +229,65 @@ class AgendamentoModel extends Database
         $duracao = max(5, $duracaoMinutos);
         $passo = max(5, $intervaloMinutos);
 
-        try {
-            $inicioExpediente = new \DateTimeImmutable($data . ' 08:00');
-            $fimExpediente    = new \DateTimeImmutable($data . ' 20:00');
-        } catch (\Throwable $e) {
-            return [];
-        }
-
-        if ($inicioExpediente >= $fimExpediente) {
-            return [];
-        }
-
-        $hoje = new \DateTimeImmutable();
-        if ($inicioExpediente->format('Y-m-d') === $hoje->format('Y-m-d') && $hoje > $inicioExpediente) {
-            $inicioExpediente = $this->alinharAoIntervalo($hoje, $passo);
-        }
-
         $intervaloDuracao = new \DateInterval('PT' . $duracao . 'M');
         $intervaloPasso   = new \DateInterval('PT' . $passo . 'M');
+        $hoje             = new \DateTimeImmutable();
+
+        $janelasExpediente = $this->obterJanelasExpediente($usuarioId, $data);
+        if (empty($janelasExpediente)) {
+            return [];
+        }
 
         $intervalosOcupados = $this->obterAgendaDoDia($usuarioId, $data, $ignorarId);
         $disponiveis = [];
 
-        for ($inicio = $inicioExpediente; $inicio < $fimExpediente; $inicio = $inicio->add($intervaloPasso)) {
-            $fimSlot = $inicio->add($intervaloDuracao);
-
-            if ($fimSlot > $fimExpediente) {
-                break;
-            }
-
-            if ($inicio < $hoje && $inicioExpediente->format('Y-m-d') === $hoje->format('Y-m-d')) {
+        foreach ($janelasExpediente as $janela) {
+            try {
+                $inicioJanela = new \DateTimeImmutable($data . ' ' . $janela['inicio']);
+                $fimJanela    = new \DateTimeImmutable($data . ' ' . $janela['fim']);
+            } catch (\Throwable $e) {
                 continue;
             }
 
-            $conflito = false;
-            foreach ($intervalosOcupados as $ocupado) {
-                if ($inicio < $ocupado['fim'] && $fimSlot > $ocupado['inicio']) {
-                    $conflito = true;
-                    break;
+            if ($inicioJanela >= $fimJanela) {
+                continue;
+            }
+
+            $inicioSlot = $this->alinharAoIntervalo($inicioJanela, $passo);
+
+            if ($inicioJanela->format('Y-m-d') === $hoje->format('Y-m-d') && $hoje > $inicioSlot) {
+                $inicioSlot = $this->alinharAoIntervalo($hoje, $passo);
+                if ($inicioSlot < $inicioJanela) {
+                    $inicioSlot = $inicioJanela;
                 }
             }
 
-            if (!$conflito) {
-                $disponiveis[] = $inicio->format('H:i');
+            for ($inicio = $inicioSlot; $inicio < $fimJanela; $inicio = $inicio->add($intervaloPasso)) {
+                $fimSlot = $inicio->add($intervaloDuracao);
+
+                if ($fimSlot > $fimJanela) {
+                    break;
+                }
+
+                if ($inicio < $hoje && $inicioJanela->format('Y-m-d') === $hoje->format('Y-m-d')) {
+                    continue;
+                }
+
+                $conflito = false;
+                foreach ($intervalosOcupados as $ocupado) {
+                    if ($inicio < $ocupado['fim'] && $fimSlot > $ocupado['inicio']) {
+                        $conflito = true;
+                        break;
+                    }
+                }
+
+                if (!$conflito && $this->estaDentroDoExpediente($usuarioId, $inicio, $fimSlot)) {
+                    $disponiveis[] = $inicio->format('H:i');
+                }
             }
         }
 
-        return $disponiveis;
+        return array_values(array_unique($disponiveis));
     }
 
     private function obterAgendaDoDia(int $usuarioId, string $data, ?int $ignorarId = null): array
@@ -330,6 +350,68 @@ class AgendamentoModel extends Database
         }
 
         return $momento->setTime((int)$momento->format('H'), (int)$momento->format('i'), 0);
+    }
+
+    private function obterJanelasExpediente(int $usuarioId, string $data): array
+    {
+        try {
+            $diaSemana = (int)(new \DateTimeImmutable($data))->format('w');
+        } catch (\Throwable $e) {
+            return $this->expedientePadrao();
+        }
+
+        $registro = $this->horarioModel->buscarPorUsuarioEDia($usuarioId, $diaSemana);
+
+        if (!$registro) {
+            return $this->expedientePadrao();
+        }
+
+        if ((int)($registro['ativo'] ?? 1) !== 1) {
+            return [];
+        }
+
+        $inicio = $registro['hora_inicio'] ?? null;
+        $fim    = $registro['hora_fim'] ?? null;
+
+        if (!$inicio || !$fim || strcmp($inicio, $fim) >= 0) {
+            return [];
+        }
+
+        return [[
+            'inicio' => $inicio,
+            'fim'    => $fim,
+        ]];
+    }
+
+    private function expedientePadrao(): array
+    {
+        return [[
+            'inicio' => '08:00:00',
+            'fim'    => '20:00:00',
+        ]];
+    }
+
+    private function estaDentroDoExpediente(int $usuarioId, \DateTimeImmutable $inicio, \DateTimeImmutable $fim): bool
+    {
+        $janelas = $this->obterJanelasExpediente($usuarioId, $inicio->format('Y-m-d'));
+        if (empty($janelas)) {
+            return false;
+        }
+
+        foreach ($janelas as $janela) {
+            try {
+                $inicioJanela = new \DateTimeImmutable($inicio->format('Y-m-d') . ' ' . $janela['inicio']);
+                $fimJanela    = new \DateTimeImmutable($inicio->format('Y-m-d') . ' ' . $janela['fim']);
+            } catch (\Throwable $e) {
+                continue;
+            }
+
+            if ($inicio >= $inicioJanela && $fim <= $fimJanela) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
