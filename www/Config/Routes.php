@@ -28,6 +28,7 @@ return [
     // Portal do Cliente - Agendamentos
     '/cliente/agendamentos'                     => ['ClienteAgendamentoController', 'index'],
     '/cliente/agendamentos/resumo'              => ['ClienteAgendamentoController', 'resumo'],
+    '/cliente/agendamentos/disponibilidades'    => ['ClienteAgendamentoController', 'disponibilidades'],
     '/cliente/agendamentos/novo'                => ['ClienteAgendamentoController', 'novo'],
     '/cliente/agendamentos/salvar'              => ['ClienteAgendamentoController', 'salvar'],
     '/cliente/agendamentos/{id}/editar'         => ['ClienteAgendamentoController', 'editar'],
@@ -40,8 +41,11 @@ return [
     '/servicos/salvar'              => ['ServicoController', 'salvar'],
     '/servicos/editar/{id}'         => ['ServicoController', 'editar'],
     '/servicos/atualizar/{id}'      => ['ServicoController', 'atualizar'],
-    '/servicos/excluir/{id}'        => ['ServicoController', 'excluir'],
+    '/servicos/excluir/{id}'        => ['ServicoController', 'desativar'],
+    '/servicos/desativar/{id}'      => ['ServicoController', 'desativar'],
+    '/servicos/ativar/{id}'         => ['ServicoController', 'ativar'],
     '/servicos/categorias/criar'    => ['ServicoController', 'criarCategoria'],
+    '/servicos/categorias/excluir/{id}' => ['ServicoController', 'excluirCategoria'],
 
     // Clientes
     '/clientes'                     => ['ClienteController', 'index'],
@@ -63,5 +67,9 @@ return [
     '/profissionais'                => ['ProfissionalController', 'index'],
     '/profissionais/novo'           => ['ProfissionalController', 'novo'],
     '/profissionais/salvar'         => ['ProfissionalController', 'salvar'],
+    '/profissionais/{id}/horarios'  => ['HorarioTrabalhoController', 'editar'],
+    '/profissionais/{id}/horarios/salvar' => ['HorarioTrabalhoController', 'salvar'],
+    '/profissional/horarios'        => ['HorarioTrabalhoController', 'editarProprio'],
+    '/profissional/horarios/salvar' => ['HorarioTrabalhoController', 'salvarProprio'],
 ];
 

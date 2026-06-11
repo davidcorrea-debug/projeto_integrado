@@ -17,6 +17,7 @@
                 $agLabel  = $role === 'cliente' ? 'Meus agendamentos' : 'Agendamentos';
                 $servicosActive = strpos($_SERVER['REQUEST_URI'], 'servicos') !== false;
                 $profActive     = strpos($_SERVER['REQUEST_URI'], 'profissionais') !== false;
+                $horarioActive  = strpos($_SERVER['REQUEST_URI'], 'horarios') !== false && $role === 'profissional';
                 $estabActive    = strpos($_SERVER['REQUEST_URI'], 'estabelecimento') !== false;
                 $configActive   = strpos($_SERVER['REQUEST_URI'], 'configuracoes') !== false;
             ?>
@@ -43,6 +44,13 @@
                     <a href="<?php echo base_url('profissionais'); ?>" class="sidebar-link <?php echo $profActive ? 'is-active' : ''; ?>">
                         <i class="bi bi-person-gear"></i>
                         <span>Profissionais</span>
+                    </a>
+                <?php endif; ?>
+
+                <?php if ($role === 'profissional'): ?>
+                    <a href="<?php echo base_url('profissional/horarios'); ?>" class="sidebar-link <?php echo $horarioActive ? 'is-active' : ''; ?>">
+                        <i class="bi bi-clock-history"></i>
+                        <span>Horários de trabalho</span>
                     </a>
                 <?php endif; ?>
 

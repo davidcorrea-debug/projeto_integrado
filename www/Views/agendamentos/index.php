@@ -47,11 +47,18 @@
             <?php else: ?>
                 <?php
                     $mapBadge = [
-                        'aguardando'   => 'bg-warning text-dark',
-                        'confirmado'   => 'bg-success',
-                        'em_andamento' => 'bg-primary',
-                        'concluido'    => 'bg-secondary',
-                        'cancelado'    => 'bg-danger',
+                        'aguardando'   => 'badge-status badge-status--aguardando',
+                        'confirmado'   => 'badge-status badge-status--confirmado',
+                        'em_andamento' => 'badge-status badge-status--em-andamento',
+                        'concluido'    => 'badge-status badge-status--concluido',
+                        'cancelado'    => 'badge-status badge-status--cancelado',
+                    ];
+
+                    $statusButtons = [
+                        'confirmado'   => ['label' => 'Confirmar',     'context' => 'success', 'icon' => 'bi-check-circle'],
+                        'em_andamento' => ['label' => 'Em andamento', 'context' => 'info',    'icon' => 'bi-lightning-charge'],
+                        'concluido'    => ['label' => 'Concluir',      'context' => 'primary', 'icon' => 'bi-flag'],
+                        'cancelado'    => ['label' => 'Cancelar',      'context' => 'danger',  'icon' => 'bi-x-circle', 'confirm' => 'Deseja realmente cancelar este agendamento?'],
                     ];
                 ?>
                 <?php foreach ($agendamentos as $a):
@@ -77,8 +84,29 @@
                                 <div class="text-muted small"><i class="bi bi-person-badge me-1"></i> Profissional: <?php echo htmlspecialchars($a['profissional_nome'] ?? ''); ?></div>
                             </div>
                         </div>
-                        <div class="d-flex flex-column align-items-md-end">
-                            <span class="badge <?php echo $badgeClass; ?> rounded-pill mb-2 px-3 py-2"><?php echo ucfirst(str_replace('_',' ', $status)); ?></span>
+                        <div class="d-flex flex-column align-items-md-end align-items-start gap-2 status-column">
+                            <span class="badge <?php echo $badgeClass; ?>"><?php echo ucfirst(str_replace('_',' ', $status)); ?></span>
+                            <?php if (in_array($role ?? '', ['admin','profissional'])): ?>
+                                <div class="d-flex flex-wrap gap-2 justify-content-start justify-content-md-end status-action-group">
+                                    <?php foreach ($statusButtons as $code => $config):
+                                        $isCurrent = $status === $code;
+                                        $context   = $config['context'];
+                                        $btnClass  = $isCurrent ? 'btn-' . $context : 'btn-outline-' . $context;
+                                    ?>
+                                        <form action="<?php echo base_url('agendamentos/status/' . $a['agendamento_id']); ?>" method="POST" class="d-inline">
+                                            <input type="hidden" name="status" value="<?php echo $code; ?>">
+                                            <input type="hidden" name="data" value="<?php echo htmlspecialchars($data); ?>">
+                                            <button type="submit"
+                                                    class="btn btn-sm <?php echo $btnClass; ?> rounded-pill status-action-btn"
+                                                    <?php echo $isCurrent ? 'disabled' : ''; ?>
+                                                    <?php echo (!empty($config['confirm']) && !$isCurrent) ? "onclick=\"return confirm('{$config['confirm']}')\"" : ''; ?>>
+                                                <i class="bi <?php echo $config['icon']; ?> me-1"></i>
+                                                <?php echo $config['label']; ?>
+                                            </button>
+                                        </form>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endforeach; ?>

@@ -6,9 +6,12 @@ use Models\Database;
 
 class AgendamentoModel extends Database
 {
+    private HorarioTrabalhoModel $horarioModel;
+
     public function __construct()
     {
         parent::__construct('agendamentos');
+        $this->horarioModel = new HorarioTrabalhoModel($this->getConnection());
     }
 
     /**
@@ -188,26 +191,227 @@ class AgendamentoModel extends Database
     /**
      * Verifica se já existe agendamento no mesmo horário para o profissional
      */
-    public function existeConflitoHorario(int $usuarioId, string $data, string $hora, ?int $ignorarId = null): bool
+    public function existeConflitoHorario(int $usuarioId, string $data, string $hora, ?int $ignorarId = null, ?int $duracaoMinutos = null): bool
     {
-        $sql = "SELECT COUNT(*) AS total
-                FROM agendamentos
-                WHERE usuario_id = ?
-                  AND agendamento_data = ?
-                  AND agendamento_hora = ?
-                  AND agendamento_status <> 'cancelado'";
+        $duracao = $duracaoMinutos ?? 30;
+        return $this->temConflitoIntervalo($usuarioId, $data, $hora, $duracao, $ignorarId);
+    }
 
-        $params = [$usuarioId, $data, $hora];
+    public function temConflitoIntervalo(int $usuarioId, string $data, string $horaInicio, int $duracaoMinutos, ?int $ignorarId = null): bool
+    {
+        $duracao = max(5, $duracaoMinutos);
+
+        try {
+            $inicio = new \DateTimeImmutable($data . ' ' . $horaInicio);
+        } catch (\Throwable $e) {
+            return true;
+        }
+
+        $fim = $inicio->add(new \DateInterval('PT' . $duracao . 'M'));
+
+        if (!$this->estaDentroDoExpediente($usuarioId, $inicio, $fim)) {
+            return true;
+        }
+
+        $intervalos = $this->obterAgendaDoDia($usuarioId, $data, $ignorarId);
+
+        foreach ($intervalos as $intervalo) {
+            if ($inicio < $intervalo['fim'] && $fim > $intervalo['inicio']) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function calcularHorariosDisponiveis(int $usuarioId, string $data, int $duracaoMinutos, int $intervaloMinutos = 15, ?int $ignorarId = null): array
+    {
+        $duracao = max(5, $duracaoMinutos);
+        $passo = max(5, $intervaloMinutos);
+
+        $intervaloDuracao = new \DateInterval('PT' . $duracao . 'M');
+        $intervaloPasso   = new \DateInterval('PT' . $passo . 'M');
+        $hoje             = new \DateTimeImmutable();
+
+        $janelasExpediente = $this->obterJanelasExpediente($usuarioId, $data);
+        if (empty($janelasExpediente)) {
+            return [];
+        }
+
+        $intervalosOcupados = $this->obterAgendaDoDia($usuarioId, $data, $ignorarId);
+        $disponiveis = [];
+
+        foreach ($janelasExpediente as $janela) {
+            try {
+                $inicioJanela = new \DateTimeImmutable($data . ' ' . $janela['inicio']);
+                $fimJanela    = new \DateTimeImmutable($data . ' ' . $janela['fim']);
+            } catch (\Throwable $e) {
+                continue;
+            }
+
+            if ($inicioJanela >= $fimJanela) {
+                continue;
+            }
+
+            $inicioSlot = $this->alinharAoIntervalo($inicioJanela, $passo);
+
+            if ($inicioJanela->format('Y-m-d') === $hoje->format('Y-m-d') && $hoje > $inicioSlot) {
+                $inicioSlot = $this->alinharAoIntervalo($hoje, $passo);
+                if ($inicioSlot < $inicioJanela) {
+                    $inicioSlot = $inicioJanela;
+                }
+            }
+
+            for ($inicio = $inicioSlot; $inicio < $fimJanela; $inicio = $inicio->add($intervaloPasso)) {
+                $fimSlot = $inicio->add($intervaloDuracao);
+
+                if ($fimSlot > $fimJanela) {
+                    break;
+                }
+
+                if ($inicio < $hoje && $inicioJanela->format('Y-m-d') === $hoje->format('Y-m-d')) {
+                    continue;
+                }
+
+                $conflito = false;
+                foreach ($intervalosOcupados as $ocupado) {
+                    if ($inicio < $ocupado['fim'] && $fimSlot > $ocupado['inicio']) {
+                        $conflito = true;
+                        break;
+                    }
+                }
+
+                if (!$conflito && $this->estaDentroDoExpediente($usuarioId, $inicio, $fimSlot)) {
+                    $disponiveis[] = $inicio->format('H:i');
+                }
+            }
+        }
+
+        return array_values(array_unique($disponiveis));
+    }
+
+    private function obterAgendaDoDia(int $usuarioId, string $data, ?int $ignorarId = null): array
+    {
+        $sql = "SELECT a.agendamento_id, a.agendamento_hora, a.agendamento_status, s.servico_duracao
+                FROM agendamentos a
+                INNER JOIN servicos s ON s.servico_id = a.servico_id
+                WHERE a.usuario_id = ?
+                  AND a.agendamento_data = ?
+                  AND a.agendamento_status <> 'cancelado'";
+
+        $params = [$usuarioId, $data];
 
         if (!empty($ignorarId)) {
-            $sql    .= " AND agendamento_id <> ?";
+            $sql    .= " AND a.agendamento_id <> ?";
             $params[] = $ignorarId;
         }
 
-        $stmt = $this->execute($sql, $params);
-        $resultado = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $sql .= " ORDER BY a.agendamento_hora ASC";
 
-        return ((int)($resultado['total'] ?? 0)) > 0;
+        $stmt = $this->execute($sql, $params);
+        $registros = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        $intervalos = [];
+        foreach ($registros as $row) {
+            $horaInicio = $row['agendamento_hora'] ?? null;
+            if (!$horaInicio) {
+                continue;
+            }
+
+            try {
+                $inicio = new \DateTimeImmutable($data . ' ' . $horaInicio);
+            } catch (\Throwable $e) {
+                continue;
+            }
+
+            $duracao = (int)($row['servico_duracao'] ?? 0);
+            if ($duracao <= 0) {
+                $duracao = 30;
+            }
+
+            $fim = $inicio->add(new \DateInterval('PT' . $duracao . 'M'));
+            $intervalos[] = [
+                'inicio' => $inicio,
+                'fim'    => $fim,
+                'status' => $row['agendamento_status'] ?? 'aguardando',
+            ];
+        }
+
+        return $intervalos;
+    }
+
+    private function alinharAoIntervalo(\DateTimeImmutable $momento, int $intervaloMinutos): \DateTimeImmutable
+    {
+        $momento = $momento->setTime((int)$momento->format('H'), (int)$momento->format('i'), 0);
+        $modulo = (int)$momento->format('i') % $intervaloMinutos;
+
+        if ($modulo !== 0) {
+            $momento = $momento->add(new \DateInterval('PT' . ($intervaloMinutos - $modulo) . 'M'));
+        }
+
+        return $momento->setTime((int)$momento->format('H'), (int)$momento->format('i'), 0);
+    }
+
+    private function obterJanelasExpediente(int $usuarioId, string $data): array
+    {
+        try {
+            $diaSemana = (int)(new \DateTimeImmutable($data))->format('w');
+        } catch (\Throwable $e) {
+            return $this->expedientePadrao();
+        }
+
+        $registro = $this->horarioModel->buscarPorUsuarioEDia($usuarioId, $diaSemana);
+
+        if (!$registro) {
+            return $this->expedientePadrao();
+        }
+
+        if ((int)($registro['ativo'] ?? 1) !== 1) {
+            return [];
+        }
+
+        $inicio = $registro['hora_inicio'] ?? null;
+        $fim    = $registro['hora_fim'] ?? null;
+
+        if (!$inicio || !$fim || strcmp($inicio, $fim) >= 0) {
+            return [];
+        }
+
+        return [[
+            'inicio' => $inicio,
+            'fim'    => $fim,
+        ]];
+    }
+
+    private function expedientePadrao(): array
+    {
+        return [[
+            'inicio' => '08:00:00',
+            'fim'    => '20:00:00',
+        ]];
+    }
+
+    private function estaDentroDoExpediente(int $usuarioId, \DateTimeImmutable $inicio, \DateTimeImmutable $fim): bool
+    {
+        $janelas = $this->obterJanelasExpediente($usuarioId, $inicio->format('Y-m-d'));
+        if (empty($janelas)) {
+            return false;
+        }
+
+        foreach ($janelas as $janela) {
+            try {
+                $inicioJanela = new \DateTimeImmutable($inicio->format('Y-m-d') . ' ' . $janela['inicio']);
+                $fimJanela    = new \DateTimeImmutable($inicio->format('Y-m-d') . ' ' . $janela['fim']);
+            } catch (\Throwable $e) {
+                continue;
+            }
+
+            if ($inicio >= $inicioJanela && $fim <= $fimJanela) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -21,11 +21,21 @@ function view($viewName, $data = [])
 }
 
 function base_url($path = '') {
-    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
-    $host = $_SERVER['HTTP_HOST'];
-    $scriptName = dirname($_SERVER['SCRIPT_NAME']);
-    $url = rtrim($protocol . "://" . $host . $scriptName, '/');
-    return $url . '/' . ltrim($path, '/');
+    $configuredBase = getenv('BASE_URL')
+        ?: ($_ENV['BASE_URL'] ?? null)
+        ?: ($_SERVER['BASE_URL'] ?? null);
+
+    if ($configuredBase) {
+        $base = rtrim($configuredBase, '/');
+    } else {
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        $scriptName = dirname($_SERVER['SCRIPT_NAME'] ?? '') ?: '';
+        $base = rtrim($protocol . '://' . $host . '/' . ltrim($scriptName, '/'), '/');
+    }
+
+    $path = ltrim($path, '/');
+    return $path === '' ? $base : $base . '/' . $path;
 }
 
 function msg($texto, $tipo = 'success'){

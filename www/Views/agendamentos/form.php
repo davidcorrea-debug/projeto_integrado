@@ -48,15 +48,21 @@
                     <!-- Profissional -->
                     <div class="mb-3">
                         <label class="form-label fw-medium">Profissional <span class="text-danger">*</span></label>
-                        <select name="usuario_id" class="form-select" required>
+                        <select name="usuario_id" class="form-select" required <?php echo !empty($bloqueiaSelecaoProfissional) ? 'disabled' : ''; ?>>
                             <option value="">Selecione o profissional...</option>
                             <?php foreach ($usuarios as $u): ?>
-                                <option value="<?php echo $u['usuario_id']; ?>">
+                                <option value="<?php echo $u['usuario_id']; ?>"
+                                        <?php echo ($profissionalSelecionado !== null && (int)$profissionalSelecionado === (int)$u['usuario_id']) ? 'selected' : ''; ?>
+                                >
                                     <?php echo htmlspecialchars($u['usuario_nome']); ?>
                                     (<?php echo ucfirst($u['usuario_perfil']); ?>)
                                 </option>
                             <?php endforeach; ?>
                         </select>
+                        <?php if (!empty($bloqueiaSelecaoProfissional) && $profissionalSelecionado !== null): ?>
+                            <input type="hidden" name="usuario_id" value="<?php echo (int)$profissionalSelecionado; ?>">
+                            <small class="text-muted d-block mt-1"><i class="bi bi-person-check me-1"></i> Você está criando um agendamento como profissional logado.</small>
+                        <?php endif; ?>
                     </div>
 
                     <!-- Data e Hora -->

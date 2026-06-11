@@ -29,11 +29,12 @@ if (!empty($msg)) {
                         <th>E-mail</th>
                         <th>Perfil</th>
                         <th>Status</th>
+                        <th class="text-end">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($profissionais)): ?>
-                        <tr><td colspan="4" class="text-center text-muted py-4">Nenhum profissional encontrado.</td></tr>
+                        <tr><td colspan="5" class="text-center text-muted py-4">Nenhum profissional encontrado.</td></tr>
                     <?php else: ?>
                         <?php foreach ($profissionais as $p): ?>
                             <tr>
@@ -46,6 +47,11 @@ if (!empty($msg)) {
                                     <?php else: ?>
                                         <span class="badge bg-danger">Inativo</span>
                                     <?php endif; ?>
+                                </td>
+                                <td class="text-end">
+                                    <a href="<?php echo base_url('profissionais/' . $p['usuario_id'] . '/horarios'); ?>" class="btn btn-outline-primary btn-sm rounded-pill">
+                                        <i class="bi bi-clock-history me-1"></i> Ajustar expediente
+                                    </a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

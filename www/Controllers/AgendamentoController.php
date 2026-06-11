@@ -79,11 +79,27 @@ class AgendamentoController
             }
         }
 
+        $usuarios = (method_exists($this->usuarioModel, 'listarPorTipo') ? $this->usuarioModel->listarPorTipo('profissional') : $this->usuarioModel->listar());
+        $profissionalSelecionado = null;
+        $bloqueiaSelecaoProfissional = false;
+
+        if (function_exists('hasRole') && hasRole(['profissional']) && function_exists('currentUserId')) {
+            $usuarioAtualId = (int) currentUserId();
+            $profAtual = $this->usuarioModel->buscarPorId($usuarioAtualId);
+            if ($profAtual && ($profAtual['usuario_perfil'] ?? '') === 'profissional') {
+                $usuarios = [$profAtual];
+                $profissionalSelecionado = $usuarioAtualId;
+                $bloqueiaSelecaoProfissional = true;
+            }
+        }
+
         view('agendamentos/form', [
             'pagina'    => 'Novo Agendamento',
             'clientes'  => $clientes,
             'servicos'  => $this->servicoModel->listarAtivos(),
-            'usuarios'  => (method_exists($this->usuarioModel, 'listarPorTipo') ? $this->usuarioModel->listarPorTipo('profissional') : $this->usuarioModel->listar()),
+            'usuarios'  => $usuarios,
+            'profissionalSelecionado' => $profissionalSelecionado,
+            'bloqueiaSelecaoProfissional' => $bloqueiaSelecaoProfissional,
             'msg'       => $msg,
         ]);
     }
@@ -110,6 +126,10 @@ class AgendamentoController
             'agendamento_status'  => 'aguardando',
         ];
 
+        if (function_exists('hasRole') && hasRole(['profissional']) && function_exists('currentUserId')) {
+            $dados['usuario_id'] = (int) currentUserId();
+        }
+
         // Se for cliente, força o cliente_id para o do usuário logado e valida profissional
         if ($isCliente) {
             $email = $_SESSION['usuario_email'] ?? '';
@@ -133,8 +153,19 @@ class AgendamentoController
             redirect('agendamentos/novo');
         }
 
-        if ($this->model->existeConflitoHorario($dados['usuario_id'], $dados['agendamento_data'], $dados['agendamento_hora'])) {
-            $_SESSION['msg'] = msg('Esse profissional já possui um agendamento neste horário.', 'danger');
+        $servico = $this->servicoModel->buscarPorId($dados['servico_id']);
+        if (!$servico || (int)($servico['servico_ativo'] ?? 0) !== 1) {
+            $_SESSION['msg'] = msg('Serviço selecionado está indisponível.', 'danger');
+            redirect('agendamentos/novo');
+        }
+
+        $duracao = (int)($servico['servico_duracao'] ?? 0);
+        if ($duracao <= 0) {
+            $duracao = 30;
+        }
+
+        if ($this->model->temConflitoIntervalo($dados['usuario_id'], $dados['agendamento_data'], $dados['agendamento_hora'], $duracao)) {
+            $_SESSION['msg'] = msg('Esse horário não está disponível para o profissional selecionado.', 'danger');
             redirect('agendamentos/novo');
         }
 
@@ -161,19 +192,22 @@ class AgendamentoController
         }
 
         if ($novoStatus === 'cancelado') {
-            $data = $agendamento['agendamento_data'] ?? null;
-            $hora = $agendamento['agendamento_hora'] ?? null;
-            if (!empty($data) && !empty($hora)) {
-                try {
-                    $dataHora = new \DateTime($data . ' ' . $hora);
-                    $limite   = new \DateTime('+2 hours');
-                    if ($dataHora < $limite) {
-                        $_SESSION['msg'] = msg('Cancelamentos só são permitidos com pelo menos 2 horas de antecedência.', 'warning');
-                        $dataRedirect = $_POST['data'] ?? $data;
-                        redirect('agendamentos?data=' . $dataRedirect);
+            $perfil = $_SESSION['usuario_perfil'] ?? '';
+            if ($perfil === 'cliente') {
+                $data = $agendamento['agendamento_data'] ?? null;
+                $hora = $agendamento['agendamento_hora'] ?? null;
+                if (!empty($data) && !empty($hora)) {
+                    try {
+                        $dataHora = new \DateTime($data . ' ' . $hora);
+                        $limite   = new \DateTime('+2 hours');
+                        if ($dataHora < $limite) {
+                            $_SESSION['msg'] = msg('Cancelamentos só são permitidos com pelo menos 2 horas de antecedência.', 'warning');
+                            $dataRedirect = $_POST['data'] ?? $data;
+                            redirect('agendamentos?data=' . $dataRedirect);
+                        }
+                    } catch (\Throwable $e) {
+                        // Se não conseguir montar a data, seguimos adiante para evitar bloquear erroneamente
                     }
-                } catch (\Throwable $e) {
-                    // Se não conseguir montar a data, seguimos adiante para evitar bloquear erroneamente
                 }
             }
         }

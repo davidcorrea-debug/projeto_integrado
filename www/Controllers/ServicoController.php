@@ -27,14 +27,30 @@ class ServicoController
         $msg        = $_SESSION['msg'] ?? '';
         unset($_SESSION['msg']);
 
+        $servicos   = $this->model->listar($busca, $categoria, $ativo);
+        $categorias = $this->categoriaModel->listar();
+        $categoriasStats = $this->model->contagemPorCategoria();
+
+        $categoriasSemUso = [];
+        foreach ($categorias as $cat) {
+            $id = (int)($cat['categoria_id'] ?? 0);
+            $stats = $categoriasStats[$id] ?? ['total' => 0, 'ativos' => 0];
+            if (($stats['ativos'] ?? 0) === 0) {
+                $categoriasSemUso[] = $cat;
+            }
+        }
+
         view('servicos/index', [
-            'pagina'     => 'Serviços',
-            'servicos'   => $this->model->listar($busca, $categoria, $ativo),
-            'categorias' => $this->categoriaModel->listar(),
-            'busca'      => $busca,
-            'categoria'  => $categoria,
-            'ativo'      => $ativo,
-            'msg'        => $msg,
+            'pagina'           => 'Serviços',
+            'servicos'         => $servicos,
+            'categorias'       => $categorias,
+            'categoriasSemUso' => $categoriasSemUso,
+            'categoriasStats'  => $categoriasStats,
+            'busca'            => $busca,
+            'categoria'        => $categoria,
+            'ativo'            => $ativo,
+            'msg'              => $msg,
+            'role'             => $_SESSION['usuario_perfil'] ?? '',
         ]);
     }
 
@@ -169,11 +185,82 @@ class ServicoController
         redirect('servicos');
     }
 
-    public function excluir(int $id): void
+    public function excluirCategoria(int $id): void
     {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('servicos');
+        }
+        if (function_exists('requireRole')) requireRole(['admin']);
+
+        $categoria = $this->categoriaModel->buscarPorId($id);
+        if (!$categoria) {
+            $_SESSION['msg'] = msg('Categoria não encontrada.', 'danger');
+            redirect('servicos');
+        }
+
+        $stats = $this->model->contagemPorCategoria();
+        $temServicos = !empty($stats[$id]['total'] ?? 0);
+
+        if ($temServicos) {
+            $_SESSION['msg'] = msg('Esta categoria ainda possui serviços vinculados. Conclua os agendamentos relacionados e remova ou reatribua os serviços antes de excluir.', 'warning');
+            redirect('servicos');
+        }
+
+        try {
+            $this->categoriaModel->remover($id);
+            $_SESSION['msg'] = msg('Categoria excluída com sucesso.', 'success');
+        } catch (\Throwable $e) {
+            $_SESSION['msg'] = msg('Não foi possível excluir a categoria no momento.', 'danger');
+        }
+
+        redirect('servicos');
+    }
+
+    public function desativar(int $id): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('servicos');
+        }
         if (function_exists('requireRole')) requireRole(['admin','profissional']);
-        $this->model->remover($id);
-        $_SESSION['msg'] = msg('Serviço removido.', 'warning');
+
+        $servico = $this->model->buscarPorId($id);
+        if (!$servico) {
+            $_SESSION['msg'] = msg('Serviço não encontrado.', 'danger');
+            redirect('servicos');
+        }
+
+        $jaInativo = (int)($servico['servico_ativo'] ?? 0) === 0;
+        if ($jaInativo) {
+            $_SESSION['msg'] = msg('Este serviço já está desativado.', 'info');
+            redirect('servicos');
+        }
+
+        $this->model->desativar($id);
+        $_SESSION['msg'] = msg('Serviço desativado. Ele não aparecerá mais nos agendamentos e listagens.', 'warning');
+        redirect('servicos');
+    }
+
+    public function ativar(int $id): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('servicos');
+        }
+        if (function_exists('requireRole')) requireRole(['admin','profissional']);
+
+        $servico = $this->model->buscarPorId($id);
+        if (!$servico) {
+            $_SESSION['msg'] = msg('Serviço não encontrado.', 'danger');
+            redirect('servicos');
+        }
+
+        $jaAtivo = (int)($servico['servico_ativo'] ?? 0) === 1;
+        if ($jaAtivo) {
+            $_SESSION['msg'] = msg('Este serviço já está ativo.', 'info');
+            redirect('servicos');
+        }
+
+        $this->model->ativar($id);
+        $_SESSION['msg'] = msg('Serviço reativado e disponível novamente.', 'success');
         redirect('servicos');
     }
 }

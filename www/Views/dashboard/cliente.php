@@ -7,10 +7,10 @@
 ?>
 
 <section class="client-dashboard py-4 py-lg-5">
-    <div class="row g-4 mb-4 justify-content-end">
-        <div class="col-12 col-lg-10 col-xl-8 col-xxl-7 d-flex flex-column gap-4">
+    <div class="row g-4 mb-4 align-items-stretch">
+        <div class="col-12 d-flex flex-column gap-4">
             <div class="client-card client-dashboard__intro">
-                <div class="client-dashboard__greeting text-lg-end">
+                <div class="client-dashboard__greeting">
                     <span class="badge rounded-pill text-bg-light text-uppercase fw-semibold small mb-2">Bem-vindo(a)</span>
                     <h2 class="fw-semibold mb-1">Olá, <?php echo $clienteNome; ?>!</h2>
                     <p class="text-muted mb-0">Aqui está um resumo rápido da sua agenda e atalhos para facilitar o próximo atendimento.</p>
@@ -32,8 +32,9 @@
                         <span class="text-muted small">Resumo do compromisso mais recente agendado</span>
                     </div>
                     <?php if ($proximaSessao): ?>
-                        <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 ms-lg-auto">
-                            <?php echo formatarData($proximaSessao['agendamento_data']); ?> às <?php echo substr($proximaSessao['agendamento_hora'] ?? '', 0, 5); ?>
+                        <span class="client-chip ms-lg-auto">
+                            <i class="bi bi-calendar-event me-2 text-primary"></i>
+                            <span><?php echo formatarData($proximaSessao['agendamento_data']); ?> às <?php echo substr($proximaSessao['agendamento_hora'] ?? '', 0, 5); ?></span>
                         </span>
                     <?php endif; ?>
                 </div>

@@ -44,6 +44,7 @@ $rotasPublicas = [
 // Rotas autenticadas que devem responder sem layout (ex.: JSON)
 $rotasSemLayout = [
     '/cliente/agendamentos/resumo',
+    '/cliente/agendamentos/disponibilidades',
 ];
 
 // Se não está logado e a rota não é pública → redireciona para login
