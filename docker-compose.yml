@@ -6,15 +6,32 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: apache_server
-    ports:
-      - "8050:80"
+    environment:
+      - BASE_URL=http://localhost:8050
     volumes:
       - ./www:/var/www/html
+      - ./www/public/uploads:/var/www/html/public/uploads
+
     working_dir: /var/www/html
     depends_on:
       - mysql
     networks:
-      - app_net
+      rede_projeto:
+        ipv4_address: 192.168.100.10
+
+  nginx-proxy-manager:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: nginx_proxy_manager
+    restart: unless-stopped
+    ports:
+      - "8050:80"
+      - "8051:81"
+    volumes:
+      - ./nginx/data:/data
+      - ./nginx/letsencrypt:/etc/letsencrypt
+    networks:
+      rede_projeto:
+        ipv4_address: 192.168.100.14
 
   mysql:
     image: mysql:8.0
@@ -37,14 +54,13 @@ services:
       timeout: 3s
       retries: 20
     networks:
-      - app_net
+      rede_projeto:
+        ipv4_address: 192.168.100.11
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     container_name: phpmyadmin_server
     restart: unless-stopped
-    ports:
-      - "8051:80"
     environment:
       PMA_HOST: mysql
       PMA_PORT: 3306
@@ -52,7 +68,8 @@ services:
     depends_on:
       - mysql
     networks:
-      - app_net
+      rede_projeto:
+        ipv4_address: 192.168.100.12
 
 volumes:
   mysql_data:
@@ -60,4 +77,8 @@ volumes:
   composer_cache:
 
 networks:
-  app_net:
+  rede_projeto:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.100.0/24
