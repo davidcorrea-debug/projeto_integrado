@@ -72,7 +72,9 @@
                     <div class="list-group-item p-4 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
                         <div class="d-flex align-items-center mb-3 mb-md-0">
                             <div class="text-center me-4" style="min-width: 60px;">
-                                <h4 class="fw-bold mb-0 text-dark"><?php echo htmlspecialchars($hora); ?></h4>
+                                <h4 class="fw-bold mb-0 text-dark lh-1 text-nowrap">
+                                    <span class="appointment-time"><?php echo htmlspecialchars($hora); ?></span>
+                                </h4>
                                 <small class="text-muted"><?php echo $dur ? formatarDuracao($dur) : ''; ?></small>
                             </div>
                             <div class="bg-primary bg-opacity-10 text-primary rounded-circle text-center me-3 fw-bold" style="width: 48px; height: 48px; line-height: 48px;">
