@@ -82,6 +82,13 @@
                                 <h6 class="mb-1 fw-semibold text-dark"><?php echo htmlspecialchars($a['cliente_nome'] ?? ''); ?></h6>
                                 <div class="text-muted small mb-1"><i class="bi bi-scissors me-1"></i> <?php echo htmlspecialchars($a['servico_nome'] ?? ''); ?></div>
                                 <div class="text-muted small"><i class="bi bi-person-badge me-1"></i> Profissional: <?php echo htmlspecialchars($a['profissional_nome'] ?? ''); ?></div>
+                                <?php if (in_array($role ?? '', ['admin','profissional'])):
+                                    $observacao = trim($a['agendamento_obs'] ?? '');
+                                    if ($observacao !== ''): ?>
+                                        <div class="text-muted small fst-italic mt-2">
+                                            <i class="bi bi-chat-left-text me-1"></i><?php echo htmlspecialchars($observacao); ?>
+                                        </div>
+                                <?php endif; endif; ?>
                             </div>
                         </div>
                         <div class="d-flex flex-column align-items-md-end align-items-start gap-2 status-column">
